@@ -32,6 +32,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
  * Doctrine ORM listener for maintaining automatic routes.
  *
  * @author Noel Garcia <ngarcia@wearemarketing.com>
+ * @author Mauro Casula <mcasula@wearemarketing.com>
  */
 class AutoRouteListener
 {
@@ -89,7 +90,7 @@ class AutoRouteListener
     private function isAutoRouteable($document)
     {
         try {
-            return (boolean)$this->getMetadataFactory()->getMetadataForClass(get_class($document));
+            return (bool)$this->getMetadataFactory()->getMetadataForClass(get_class($document));
         } catch (ClassNotMappedException $e) {
             return false;
         }
@@ -132,21 +133,25 @@ class AutoRouteListener
 
             foreach ($uriContextCollection->getUriContexts() as $uriContext) {
                 $autoRoute = $uriContext->getAutoRoute();
+
                 if ($entity instanceof RouteReferrersInterface) {
                     $entity->addRoute($autoRoute);
                 }
 
                 $manager->persist($autoRoute);
+                $entityClassMetadata = $manager->getClassMetadata(get_class($entity));
+                $autoRouteClassMetadata = $manager->getClassMetadata(get_class($autoRoute));
 
                 //set persistence order to allow set in the route the contentEntity PK
                 if ($new) {
-                    $commitOrderCalculator->addDependency(
-                        $this->getEntityMetadata($manager, $entity),
-                        $this->getEntityMetadata($manager, $autoRoute)
-                    );
+                    $commitOrderCalculator->addNode($autoRouteClassMetadata->name, $autoRouteClassMetadata);
+                    $commitOrderCalculator->addNode($entityClassMetadata->name, $entityClassMetadata);
+                    $commitOrderCalculator->addDependency($autoRouteClassMetadata->name, $entityClassMetadata->name, 1);
+                    $commitOrderCalculator->sort();
                 }
 
-                $unitOfWork->computeChangeSet($this->getEntityMetadata($manager, $autoRoute), $autoRoute);
+                $unitOfWork->computeChangeSets();
+
             }
         }
 
@@ -182,14 +187,16 @@ class AutoRouteListener
         if ($this->isAutoRouteable($entity)) {
             $manager = $eventArgs->getEntityManager();
             $unitOfWork = $manager->getUnitOfWork();
+
             /** @var AutoRoute $autoRoute */
             foreach ($entity->getRoutes() as $autoRoute) {
-                if (!$autoRoute->getContentId()) {
+                if (empty($autoRoute->getContentId())) {
+                    $persister = $unitOfWork->getEntityPersister($manager->getClassMetadata(get_class($autoRoute))->name);
                     $id = $this->getEntityMetadata($manager, $entity)->getIdentifierValues($entity);
                     $autoRoute->setContentId($id);
                     $this->replaceIdOnNameField($autoRoute, $id, 'name');
                     $this->replaceIdOnNameField($autoRoute, $id, 'canonicalName');
-                    $unitOfWork->recomputeSingleEntityChangeSet($this->getEntityMetadata($manager, $autoRoute), $autoRoute);
+                    $persister->update($autoRoute);
                 }
             }
         }
