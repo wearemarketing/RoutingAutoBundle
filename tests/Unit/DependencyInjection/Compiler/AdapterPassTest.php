@@ -50,6 +50,8 @@ class AutoRoutePassTest extends AbstractCompilerPassTestCase
         $this->setDefinition('some_adapter', $adapterDef);
         $this->compile();
 
-        $this->assertEquals(new Alias('some_adapter'), $this->container->getAlias('cmf_routing_auto.adapter'));
+        $alias = new Alias('some_adapter');
+        $alias->setPrivate(false);
+        $this->assertEquals($alias, $this->container->getAlias('cmf_routing_auto.adapter'));
     }
 }
