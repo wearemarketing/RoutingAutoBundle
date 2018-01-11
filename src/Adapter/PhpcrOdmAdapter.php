@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony CMF package.
  *
- * (c) 2011-2015 Symfony CMF
+ * (c) 2011-2017 Symfony CMF
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,12 +11,14 @@
 
 namespace Symfony\Cmf\Bundle\RoutingAutoBundle\Adapter;
 
-use Doctrine\ODM\PHPCR\DocumentManager;
-use Doctrine\ODM\PHPCR\Document\Generic;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ODM\PHPCR\Document\Generic;
+use Doctrine\ODM\PHPCR\DocumentManager;
+use Symfony\Cmf\Bundle\RoutingAutoBundle\Model\AutoRoute;
+use Symfony\Cmf\Component\Routing\RouteReferrersInterface;
+use Symfony\Cmf\Component\RoutingAuto\AdapterInterface;
 use Symfony\Cmf\Component\RoutingAuto\Model\AutoRouteInterface;
 use Symfony\Cmf\Component\RoutingAuto\UriContext;
-use Symfony\Cmf\Component\RoutingAuto\AdapterInterface;
 
 /**
  * Adapter for PHPCR-ODM.
@@ -28,7 +30,9 @@ class PhpcrOdmAdapter implements AdapterInterface
     const TAG_NO_MULTILANG = 'no-multilang';
 
     protected $dm;
+
     protected $baseRoutePath;
+
     protected $autoRouteFqcn;
 
     /**
@@ -58,7 +62,7 @@ class PhpcrOdmAdapter implements AdapterInterface
             return $this->dm->getLocalesFor($contentDocument);
         }
 
-        return array();
+        return [];
     }
 
     /**
@@ -109,9 +113,10 @@ class PhpcrOdmAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function createAutoRoute(UriContext $uriContext, $contentDocument, $locale)
+    public function createAutoRoute(UriContext $uriContext, $locale)
     {
         $basePath = $this->baseRoutePath;
+        $contentDocument = $uriContext->getSubject();
         $document = $parentDocument = $this->dm->find(null, $basePath);
 
         if (null === $parentDocument) {
@@ -157,12 +162,17 @@ class PhpcrOdmAdapter implements AdapterInterface
             );
         }
 
+        /** @var AutoRoute $headRoute */
         $headRoute = new $this->autoRouteFqcn();
         $headRoute->setContent($contentDocument);
         $headRoute->setName($headName);
         $headRoute->setParentDocument($document);
         $headRoute->setLocale($locale);
         $headRoute->setType(AutoRouteInterface::TYPE_PRIMARY);
+
+        if ($contentDocument instanceof RouteReferrersInterface) {
+            $contentDocument->addRoute($headRoute);
+        }
 
         foreach ($uriContext->getDefaults() as $key => $value) {
             $headRoute->setDefault($key, $value);
@@ -198,6 +208,20 @@ class PhpcrOdmAdapter implements AdapterInterface
         }
 
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function compareAutoRouteLocale(AutoRouteInterface $autoRoute, $locale)
+    {
+        $autoRouteLocale = $autoRoute->getLocale();
+
+        if (self::TAG_NO_MULTILANG === $autoRouteLocale) {
+            $autoRouteLocale = null;
+        }
+
+        return $autoRouteLocale === $locale;
     }
 
     /**
@@ -242,6 +266,7 @@ class PhpcrOdmAdapter implements AdapterInterface
         $this->dm->getPhpcrSession()->save();
         // Detach is needed to force Doctrine to re-load the node
         $this->dm->detach($document);
+        /** @var AutoRoute $autoRoute */
         $autoRoute = $this->dm->find(null, $document->getId());
 
         if (!$autoRoute instanceof $autoRouteClassName) {
@@ -258,6 +283,9 @@ class PhpcrOdmAdapter implements AdapterInterface
         $autoRoute->setContent($contentDocument);
         $autoRoute->setLocale($locale);
         $autoRoute->setType($routeType);
+        if ($contentDocument instanceof RouteReferrersInterface) {
+            $contentDocument->addRoute($autoRoute);
+        }
 
         return $autoRoute;
     }
