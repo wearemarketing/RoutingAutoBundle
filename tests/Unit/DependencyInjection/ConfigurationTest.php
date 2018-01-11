@@ -43,6 +43,9 @@ class ConfigurationTest extends AbstractExtensionConfigurationTestCase
                     'enabled' => true,
                     'route_basepath' => '/routes',
                 ],
+                'orm' => [
+                    'enabled' => false,
+                ]
             ],
         ];
 
