@@ -13,6 +13,7 @@ namespace Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Functional\EventListener;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Functional\Repository\DoctrineOrm;
+use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\ConcreteContent;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Blog;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Post;
 use Symfony\Cmf\Component\Testing\Functional\DbManager\ORM;
@@ -152,5 +153,40 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
                 $route->getStaticPrefix()
             );
         }
+    }
+
+    /**
+     * Leave direct should migrate children.
+     */
+    public function testLeaveRedirectChildrenMigrations()
+    {
+        $this->markTestSkipped("Is tested in the testUpdateRenameBlog. At the moment we do not propagate the changes to children");
+    }
+
+    /**
+     * Ensure that we can map parent classes: #56.
+     */
+    public function testParentClassMapping()
+    {
+        $content = new ConcreteContent();
+        $content->setTitle('Hello');
+        $this->getObjectManager()->persist($content);
+        $this->getObjectManager()->flush();
+
+        $this->getObjectManager()->refresh($content);
+
+        $routes = $content->getRoutes();
+
+        $this->assertCount(1, $routes);
+
+        // Alse, We test if the route is right
+        /** @var AutoRoute $route */
+        $route = $routes[0];
+        $this->assertEquals('cmf_routing_auto.primary', $route->getType());
+        $this->assertEquals('no-multilang', $route->getTag());
+        $this->assertEquals('/articles/hello', $route->getStaticPrefix());
+        $this->assertEmpty($route->getDefaults());
+
+        // Maybe... we have to test the same but with a translatable entity
     }
 }

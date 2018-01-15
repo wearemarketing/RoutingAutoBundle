@@ -91,8 +91,8 @@ class DoctrineOrm implements RepositoryInterface
         ");
 
         $query->setParameter(':title', $title);
-        $blog = $query->getSingleResult();
+        $post = $query->getSingleResult();
 
-        return $blog;
+        return $post;
     }
 }

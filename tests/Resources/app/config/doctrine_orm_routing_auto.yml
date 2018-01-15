@@ -20,3 +20,11 @@ Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Post:
         post_title: [content_method, { method: getTitle } ]
     conflict_resolver: auto_increment
     defunct_route_handler: leave_redirect
+
+# AbstractContent for ensuring that parent class mapping works
+Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\AbstractContent:
+    definitions:
+        view:
+            uri_schema: /articles/{article_title}
+    token_providers:
+        article_title: [content_method, { method: getTitle } ]
