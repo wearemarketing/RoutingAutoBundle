@@ -19,6 +19,9 @@ use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Post;
 use Symfony\Cmf\Component\Testing\Functional\DbManager\ORM;
 use WAM\Bundle\RoutingBundle\Entity\AutoRoute;
 
+/**
+ * @group orm
+ */
 class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
 {
     public function getKernelConfiguration()
@@ -155,6 +158,369 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
         }
     }
 
+    public function testUpdatePostNotChangingTitle()
+    {
+        $this->markTestSkipped("Working...");
+        $this->createBlog(true);
+
+        $post = $this->getDm()->find(null, '/test/test-blog/This is a post title');
+        $this->assertNotNull($post);
+
+        $post->body = 'Test';
+
+        $this->getDm()->persist($post);
+        $this->getDm()->flush();
+        $this->getDm()->clear();
+
+        $post = $this->getDm()->find(null, '/test/test-blog/This is a post title');
+        $routes = $post->routes;
+
+        $this->assertCount(1, $routes);
+        $this->assertInstanceOf('Symfony\Cmf\Bundle\RoutingAutoBundle\Model\AutoRoute', $routes[0]);
+
+        $this->assertEquals('this-is-a-post-title', $routes[0]->getName());
+    }
+
+    public function testRemoveBlog()
+    {
+        $this->markTestSkipped("Working...");
+        $this->createBlog();
+        $blog = $this->getDm()->find(null, '/test/test-blog');
+
+        // test removing
+        $this->getDm()->remove($blog);
+
+        $this->getDm()->flush();
+
+        $baseRoute = $this->getDm()->find(null, '/test/auto-route/blog');
+        $routes = $this->getDm()->getChildren($baseRoute);
+        $this->assertCount(0, $routes);
+    }
+
+    public function testPersistPost()
+    {
+        $this->markTestSkipped("Working...");
+        $this->createBlog(true);
+        $route = $this->getDm()->find(null, '/test/auto-route/blog/unit-testing-blog/2013/03/21/this-is-a-post-title');
+        $this->assertNotNull($route);
+
+        // make sure auto-route references content
+        $post = $this->getDm()->find(null, '/test/test-blog/This is a post title');
+        $routes = $this->getDm()->getReferrers($post);
+
+        $this->assertCount(1, $routes);
+        $this->assertInstanceOf('Symfony\Cmf\Bundle\RoutingAutoBundle\Model\AutoRoute', $routes[0]);
+        $this->assertEquals('this-is-a-post-title', $routes[0]->getName());
+    }
+
+    public function testUpdatePost()
+    {
+        $this->markTestSkipped("Working...");
+        $this->createBlog(true);
+
+        // make sure auto-route references content
+        $post = $this->getDm()->find(null, '/test/test-blog/This is a post title');
+        $post->title = 'This is different';
+
+        // test for issue #52
+        $post->date = new \DateTime('2014-01-25');
+
+        $this->getDm()->persist($post);
+        $this->getDm()->flush();
+
+        $routes = $this->getDm()->getReferrers($post);
+
+        $this->assertCount(1, $routes);
+        $route = $routes[0];
+
+        $this->assertInstanceOf('Symfony\Cmf\Bundle\RoutingAutoBundle\Model\AutoRoute', $route);
+        $this->assertEquals('this-is-different', $route->getName());
+
+        $node = $this->getDm()->getNodeForDocument($route);
+        $this->assertEquals(
+            '/test/auto-route/blog/unit-testing-blog/2014/01/25/this-is-different',
+            $node->getPath()
+        );
+    }
+
+    public function provideMultilangArticle()
+    {
+        return [
+            [
+                [
+                    'en' => 'Hello everybody!',
+                    'fr' => 'Bonjour le monde!',
+                    'de' => 'Gutentag',
+                    'es' => 'Hola todo el mundo',
+                ],
+                [
+                    'test/auto-route/articles/en/hello-everybody',
+                    'test/auto-route/articles/fr/bonjour-le-monde',
+                    'test/auto-route/articles/de/gutentag',
+                    'test/auto-route/articles/es/hola-todo-el-mundo',
+
+                    'test/auto-route/articles/en/hello-everybody-edit',
+                    'test/auto-route/articles/fr/bonjour-le-monde-edit',
+                    'test/auto-route/articles/de/gutentag-edit',
+                    'test/auto-route/articles/es/hola-todo-el-mundo-edit',
+
+                    'test/auto-route/articles/en/hello-everybody-review',
+                    'test/auto-route/articles/fr/bonjour-le-monde-review',
+                    'test/auto-route/articles/de/gutentag-review',
+                    'test/auto-route/articles/es/hola-todo-el-mundo-review',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider provideMultilangArticle
+     */
+    public function testMultilangArticle($data, $expectedPaths)
+    {
+        $this->markTestSkipped("Working...");
+        $article = new Article();
+        $article->path = '/test/article-1';
+        $this->getDm()->persist($article);
+
+        foreach ($data as $lang => $title) {
+            $article->title = $title;
+            $this->getDm()->bindTranslation($article, $lang);
+        }
+
+        $this->getDm()->flush();
+        $this->getDm()->clear();
+
+        $locales = array_keys($data);
+
+        foreach ($expectedPaths as $i => $expectedPath) {
+            $localeIndex = $i % count($locales);
+            $expectedLocale = $locales[$localeIndex];
+
+            $route = $this->getDm()->find(null, $expectedPath);
+
+            $this->assertNotNull($route, 'Route: '.$expectedPath);
+            $this->assertInstanceOf('Symfony\Cmf\Bundle\RoutingAutoBundle\Model\AutoRoute', $route);
+            $this->assertEquals($expectedLocale, $route->getLocale());
+
+            $content = $route->getContent();
+
+            $this->assertNotNull($content);
+            $this->assertInstanceOf('Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Document\Article', $content);
+
+            // We havn't loaded the translation for the document, so it is always in the default language
+            $this->assertEquals('Hello everybody!', $content->title);
+        }
+    }
+
+    public function provideUpdateMultilangArticle()
+    {
+        return [
+            [
+                [
+                    'en' => 'Hello everybody!',
+                    'fr' => 'Bonjour le monde!',
+                    'de' => 'Gutentag',
+                    'es' => 'Hola todo el mundo',
+                ],
+                [
+                    'test/auto-route/articles/en/hello-everybody',
+                    'test/auto-route/articles/fr/bonjour-le-monde',
+                    'test/auto-route/articles/de/gutentag-und-auf-wiedersehen',
+                    'test/auto-route/articles/es/hola-todo-el-mundo',
+                ],
+            ],
+        ];
+    }
+
+    public function testMultilangArticleRemainsSameLocale()
+    {
+        $this->markTestSkipped("Working...");
+        $article = new Article();
+        $article->path = '/test/article-1';
+        $article->title = 'Good Day';
+        $this->getDm()->persist($article);
+        $this->getDm()->flush();
+
+        $article->title = 'Hello everybody!';
+        $this->getDm()->bindTranslation($article, 'en');
+
+        $article->title = 'Bonjour le monde!';
+        $this->getDm()->bindTranslation($article, 'fr');
+
+        // let current article be something else than the last bound locale
+        $this->getDm()->findTranslation(get_class($article), $this->getDm()->getUnitOfWork()->getDocumentId($article), 'en');
+
+        $this->getDm()->flush();
+        $this->getDm()->clear();
+
+        $this->assertEquals('Hello everybody!', $article->title);
+    }
+
+    /**
+     * @dataProvider provideUpdateMultilangArticle
+     */
+    public function testUpdateMultilangArticle($data, $expectedPaths)
+    {
+        $this->markTestSkipped("Working...");
+        $article = new Article();
+        $article->path = '/test/article-1';
+        $this->getDm()->persist($article);
+
+        foreach ($data as $lang => $title) {
+            $article->title = $title;
+            $this->getDm()->bindTranslation($article, $lang);
+        }
+
+        $this->getDm()->flush();
+
+        $article_de = $this->getDm()->findTranslation('Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Document\Article', '/test/article-1', 'de');
+        $article_de->title .= '-und-auf-wiedersehen';
+        $this->getDm()->bindTranslation($article_de, 'de');
+        $this->getDm()->persist($article_de);
+
+        $this->getDm()->flush();
+
+        $article_de = $this->getDm()->findTranslation('Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Document\Article', '/test/article-1', 'de');
+        $routes = $this->getDm()->getReferrers($article_de);
+
+        // Multiply the expected paths by 3 because Article has 3 routes defined.
+        $this->assertCount(count($data) * 3, $routes);
+
+        $this->getDm()->clear();
+
+        foreach ($expectedPaths as $expectedPath) {
+            $route = $this->getDm()->find(null, $expectedPath);
+
+            $this->assertNotNull($route);
+            $this->assertInstanceOf('Symfony\Cmf\Bundle\RoutingAutoBundle\Model\AutoRoute', $route);
+
+            $content = $route->getContent();
+
+            $this->assertNotNull($content);
+            $this->assertInstanceOf('Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Document\Article', $content);
+
+            // We havn't loaded the translation for the document, so it is always in the default language
+            $this->assertEquals('Hello everybody!', $content->title);
+        }
+    }
+
+    public function testResolveConflictOnSingleMultilangArticle()
+    {
+        $this->markTestSkipped("Working...");
+        $article = new ConflictProneArticle();
+        $article->path = '/test/article';
+        $article->title = 'Weekend';
+        $this->getDm()->persist($article);
+        $this->getDm()->bindTranslation($article, 'fr');
+
+        $article->title = 'Weekend';
+        $this->getDm()->bindTranslation($article, 'en');
+
+        $this->getDm()->flush();
+
+        $route = $this->getDm()->find(AutoRoute::class, 'test/auto-route/conflict-prone-articles/weekend');
+        $this->assertNotNull($route);
+
+        $route = $this->getDm()->find(AutoRoute::class, 'test/auto-route/conflict-prone-articles/weekend-1');
+        $this->assertNotNull($route);
+    }
+
+    public function provideLeaveRedirect()
+    {
+        return [
+            [
+                [
+                    'en' => 'Hello everybody!',
+                    'fr' => 'Bonjour le monde!',
+                    'de' => 'Gutentag',
+                    'es' => 'Hola todo el mundo',
+                ],
+                [
+                    'en' => 'Goodbye everybody!',
+                    'fr' => 'Aurevoir le monde!',
+                    'de' => 'Auf weidersehn',
+                    'es' => 'Adios todo el mundo',
+                ],
+                [
+                    'test/auto-route/seo-articles/en/hello-everybody',
+                    'test/auto-route/seo-articles/fr/bonjour-le-monde',
+                    'test/auto-route/seo-articles/de/gutentag',
+                    'test/auto-route/seo-articles/es/hola-todo-el-mundo',
+                ],
+                [
+                    'test/auto-route/seo-articles/en/goodbye-everybody',
+                    'test/auto-route/seo-articles/fr/aurevoir-le-monde',
+                    'test/auto-route/seo-articles/de/auf-weidersehn',
+                    'test/auto-route/seo-articles/es/adios-todo-el-mundo',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider provideLeaveRedirect
+     */
+    public function testLeaveRedirect($data, $updatedData, $expectedRedirectRoutePaths, $expectedAutoRoutePaths)
+    {
+        $this->markTestSkipped("Working...");
+        $article = new SeoArticleMultilang();
+        $article->title = 'Hai';
+        $article->path = '/test/article-1';
+        $this->getDm()->persist($article);
+
+        foreach ($data as $lang => $title) {
+            $article->title = $title;
+            $this->getDm()->bindTranslation($article, $lang);
+        }
+
+        $this->getDm()->flush();
+
+        foreach ($updatedData as $lang => $title) {
+            $article = $this->getDm()->findTranslation('Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Document\SeoArticleMultilang', '/test/article-1', $lang);
+            $article->title = $title;
+            $this->getDm()->bindTranslation($article, $lang);
+        }
+
+        $this->getDm()->persist($article);
+        $this->getDm()->flush();
+
+        foreach ($expectedRedirectRoutePaths as $originalPath) {
+            $redirectRoute = $this->getDm()->find(null, $originalPath);
+            $this->assertNotNull($redirectRoute, 'Redirect exists for: '.$originalPath);
+            $this->assertEquals(AutoRouteInterface::TYPE_REDIRECT, $redirectRoute->getDefault('type'));
+        }
+
+        foreach ($expectedAutoRoutePaths as $newPath) {
+            $autoRoute = $this->getDm()->find(null, $newPath);
+            $this->assertNotNull($autoRoute, 'Autoroute exists for: '.$newPath);
+            $this->assertEquals(AutoRouteInterface::TYPE_PRIMARY, $autoRoute->getDefault('type'));
+        }
+    }
+
+    /**
+     * @depends testLeaveRedirect
+     *
+     * See https://github.com/symfony-cmf/RoutingAutoBundle/issues/111
+     */
+    public function testLeaveRedirectAndRenameToOriginal()
+    {
+        $this->markTestSkipped("Working...");
+        $article = new SeoArticle();
+        $article->title = 'Hai';
+        $article->path = '/test/article-1';
+        $this->getDm()->persist($article);
+        $this->getDm()->flush();
+
+        $article->title = 'Ho';
+        $this->getDm()->persist($article);
+        $this->getDm()->flush();
+
+        $article->title = 'Hai';
+        $this->getDm()->persist($article);
+        $this->getDm()->flush();
+    }
+
     /**
      * Leave direct should migrate children.
      */
@@ -188,5 +554,115 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
         $this->assertEmpty($route->getDefaults());
 
         // Maybe... we have to test the same but with a translatable entity
+    }
+
+    public function testConflictResolverAutoIncrement()
+    {
+        $this->markTestSkipped("Working...");
+        $this->createBlog();
+        $blog = $this->getDm()->find(null, '/test/test-blog');
+
+        $post = new Post();
+        $post->name = 'Post 1';
+        $post->title = 'Same Title';
+        $post->blog = $blog;
+        $post->date = new \DateTime('2013/03/21');
+        $this->getDm()->persist($post);
+        $this->getDm()->flush();
+
+        $post = new Post();
+        $post->name = 'Post 2';
+        $post->title = 'Same Title';
+        $post->blog = $blog;
+        $post->date = new \DateTime('2013/03/21');
+        $this->getDm()->persist($post);
+        $this->getDm()->flush();
+
+        $post = new Post();
+        $post->name = 'Post 3';
+        $post->title = 'Same Title';
+        $post->blog = $blog;
+        $post->date = new \DateTime('2013/03/21');
+        $this->getDm()->persist($post);
+        $this->getDm()->flush();
+
+        $expectedRoutes = [
+            '/test/auto-route/blog/unit-testing-blog/2013/03/21/same-title',
+            '/test/auto-route/blog/unit-testing-blog/2013/03/21/same-title-1',
+            '/test/auto-route/blog/unit-testing-blog/2013/03/21/same-title-2',
+        ];
+
+        foreach ($expectedRoutes as $expectedRoute) {
+            $route = $this->getDm()->find('Symfony\Cmf\Bundle\RoutingAutoBundle\Model\AutoRoute', $expectedRoute);
+            $this->assertNotNull($route);
+        }
+    }
+
+    public function testCreationOfChildOnRoot()
+    {
+        $this->markTestSkipped("Working...");
+        $page = new Page();
+        $page->title = 'Home';
+        $page->path = '/test/home';
+        $this->getDm()->persist($page);
+        $this->getDm()->flush();
+
+        $expectedRoute = '/test/auto-route/home';
+        $route = $this->getDm()->find('Symfony\Cmf\Bundle\RoutingAutoBundle\Model\AutoRoute', $expectedRoute);
+
+        $this->assertNotNull($route);
+    }
+
+    /**
+     * @expectedException \Symfony\Cmf\Component\RoutingAuto\ConflictResolver\Exception\ExistingUriException
+     */
+    public function testConflictResolverDefaultThrowException()
+    {
+        $this->markTestSkipped("Working...");
+        $blog = new Blog();
+        $blog->path = '/test/test-blog';
+        $blog->title = 'Unit testing blog';
+        $this->getDm()->persist($blog);
+        $this->getDm()->flush();
+
+        $blog = new Blog();
+        $blog->path = '/test/test-blog-the-second';
+        $blog->title = 'Unit testing blog';
+        $this->getDm()->persist($blog);
+        $this->getDm()->flush();
+    }
+
+    public function testGenericNodeShouldBeConvertedInAnAutoRouteNode()
+    {
+        $this->markTestSkipped("Working...");
+        $blog = new Blog();
+        $blog->path = '/test/my-post';
+        $blog->title = 'My Post';
+        $this->getDm()->persist($blog);
+        $this->getDm()->flush();
+
+        $this->assertInstanceOf(
+            'Doctrine\ODM\PHPCR\Document\Generic',
+            $this->getDm()->find(null, '/test/auto-route/blog')
+        );
+        $blogRoute = $this->getDm()->find(null, '/test/auto-route/blog/my-post');
+        $this->assertInstanceOf('Symfony\Cmf\Component\RoutingAuto\Model\AutoRouteInterface', $blogRoute);
+        $this->assertSame($blog, $blogRoute->getContent());
+
+        $page = new Page();
+        $page->path = '/test/blog';
+        $page->title = 'Blog';
+
+        $this->getDm()->persist($page);
+        $this->getDm()->flush();
+
+        $this->assertInstanceOf(
+            'Symfony\Cmf\Component\RoutingAuto\Model\AutoRouteInterface',
+            $this->getDm()->find(null, '/test/auto-route/blog')
+        );
+        $this->assertInstanceOf(
+            'Symfony\Cmf\Component\RoutingAuto\Model\AutoRouteInterface',
+            $this->getDm()->find(null, '/test/auto-route/blog/my-post')
+        );
     }
 }

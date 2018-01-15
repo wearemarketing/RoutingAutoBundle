@@ -15,5 +15,4 @@ use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Functional\OrmBaseTestCase;
 
 abstract class ListenerTestCase extends OrmBaseTestCase
 {
-
 }

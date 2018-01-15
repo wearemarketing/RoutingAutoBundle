@@ -25,7 +25,6 @@ class DoctrineOrm implements RepositoryInterface
     public function createBlog($withPosts = false)
     {
         $blog = new Blog();
-        $blog->path = '/test/test-blog';
         $blog->setTitle('Unit testing blog');
         $blog->mergeNewTranslations();
 
