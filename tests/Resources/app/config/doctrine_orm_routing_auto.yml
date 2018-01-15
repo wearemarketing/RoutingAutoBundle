@@ -1,0 +1,8 @@
+Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Blog:
+    definitions:
+        frontend:
+            uri_schema: /blog/{blog_title}
+            defaults:
+                _controller: BlogController
+    token_providers:
+        blog_title: [content_method, { method: getTitle } ]

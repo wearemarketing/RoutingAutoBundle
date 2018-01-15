@@ -24,7 +24,7 @@ use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Document\SeoArticle;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Document\SeoArticleMultilang;
 use Symfony\Cmf\Component\RoutingAuto\Model\AutoRouteInterface;
 
-class AutoRouteListenerTest extends BaseTestCase
+class PhpcrOdmAutoRouteListenerTest extends BaseTestCase
 {
     protected function createBlog($withPosts = false)
     {

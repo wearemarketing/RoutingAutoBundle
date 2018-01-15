@@ -1,0 +1,51 @@
+imports:
+    - { resource: '../../../../vendor/knplabs/doctrine-behaviors/config/orm-services.yml' }
+
+wam_locale:
+    locales: [ es, en ]
+    guess_locale: false
+    locale_switcher_mode: redirect_to_home
+    fallback:
+        hreflang: es_ES
+        internals: %locale%
+        url: ~
+
+    matrix:
+        # internal is the key
+        es:
+            hreflang: es_ES
+            url: ~
+            label: Español
+        en:
+            hreflang: en_GB
+            url: en-gb
+            label: English
+
+wam_banner:
+    zones: {TOP: TOP, FOOTER: FOOTER}
+
+sonata_media:
+    default_context: default
+    db_driver: doctrine_orm
+    contexts:
+        default:
+            providers: ~
+    cdn:
+        server:
+            path: /uploads/media
+    filesystem:
+        local:
+            directory:  "%kernel.root_dir%/../web/uploads/media"
+            create:     false
+
+services:
+    wam_routing.content.router_enhancer:
+        class: WAM\Bundle\RoutingBundle\Enhancer\ContentRouteEnhancer
+        public: false
+        arguments: [ '@doctrine.orm.entity_manager' ]
+        tags:
+            - { name: "dynamic_router_route_enhancer", priority: 255 }
+
+parameters:
+    cmf_routing.auto_route_entity.class: WAM\Bundle\RoutingBundle\Entity\AutoRoute
+    contact_email: alala@ala.com

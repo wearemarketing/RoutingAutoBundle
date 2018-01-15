@@ -11,6 +11,7 @@
 
 namespace Symfony\Cmf\Bundle\RoutingAutoBundle;
 
+use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Doctrine\Bundle\PHPCRBundle\DependencyInjection\Compiler\DoctrinePhpcrMappingsPass;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\DependencyInjection\Compiler\AdapterPass;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\DependencyInjection\Compiler\ServicePass;
@@ -25,6 +26,7 @@ class CmfRoutingAutoBundle extends Bundle
         $container->addCompilerPass(new ServicePass());
         $container->addCompilerPass(new AdapterPass());
         $this->buildPhpcrCompilerPass($container);
+        $this->buildOrmCompilerPass($container);
     }
 
     /**
@@ -35,13 +37,10 @@ class CmfRoutingAutoBundle extends Bundle
      */
     private function buildPhpcrCompilerPass(ContainerBuilder $container)
     {
-        if (!class_exists('Doctrine\Bundle\PHPCRBundle\DependencyInjection\Compiler\DoctrinePhpcrMappingsPass')
-            || !class_exists('Doctrine\ODM\PHPCR\Version')
-        ) {
+        $bundles = $container->getParameter('kernel.bundles');
+        if (!isset($bundles['CmfRoutingBundle']) || !isset($bundles['DoctrinePHPCRBundle'])) {
             return;
         }
-
-        $bundles = $container->getParameter('kernel.bundles');
 
         if (isset($bundles['CmfRoutingBundle'])) {
             $container->addCompilerPass(
@@ -55,5 +54,30 @@ class CmfRoutingAutoBundle extends Bundle
                 )
             );
         }
+    }
+
+    /**
+     * Creates and registers compiler passes for ORM mappings if both doctrine
+     * ORM and a suitable compiler pass implementation are available.
+     *
+     * @param ContainerBuilder $container
+     */
+    private function buildOrmCompilerPass(ContainerBuilder $container)
+    {
+        $bundles = $container->getParameter('kernel.bundles');
+        if (!isset($bundles['CmfRoutingBundle']) || !isset($bundles['DoctrineBundle']) || isset($bundles['DoctrinePHPCRBundle'])) {
+            return;
+        }
+
+        $container->addCompilerPass(
+            DoctrineOrmMappingsPass::createXmlMappingDriver(
+                array(
+                    realpath(__DIR__ . '/Resources/config/doctrine-model') => 'Symfony\Cmf\Bundle\RoutingAutoBundle\Model',
+                ),
+                array('cmf_routing_auto.dynamic.persistence.orm.manager_name'),
+                false,
+                array('CmfRoutingAutoBundle' => 'Symfony\Cmf\Bundle\RoutingAutoBundle\Doctrine\Orm')
+            )
+        );
     }
 }

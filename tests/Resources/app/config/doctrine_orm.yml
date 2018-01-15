@@ -1,0 +1,43 @@
+cmf_routing:
+    chain:
+        routers_by_id:
+            cmf_routing.dynamic_router: 20
+            router.default: 100
+    dynamic:
+        enabled: true
+        controllers_by_type:
+            cmf_routing_auto.redirect: cmf_routing_auto.redirect_controller:redirectAction
+        persistence:
+            orm:
+                enabled: true
+
+cmf_routing_auto:
+    auto_mapping: false
+    persistence:
+        phpcr:
+            enabled: false
+        orm:
+            enabled: true
+    mapping:
+        resources:
+            - "%kernel.root_dir%/config/doctrine_orm_routing_auto.yml"
+#            - '@CmfRoutingAutoBundle/Tests/Resources/app/config/routing_auto.yml'
+
+doctrine:
+    dbal:
+        driver:   "%database_driver%"
+        host:     "%database_host%"
+        port:     "%database_port%"
+        dbname:   "%database_name%"
+        user:     "%database_user%"
+        password: "%database_password%"
+        charset:  UTF8
+
+    orm:
+        auto_mapping: true
+        mappings:
+            test:
+                type: "annotation"
+                prefix: Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity
+                dir: "%kernel.root_dir%/../Entity"
+                is_bundle: false

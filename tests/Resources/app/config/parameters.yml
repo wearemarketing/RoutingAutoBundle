@@ -1,0 +1,9 @@
+parameters:
+    database_driver: pdo_mysql
+    database_host: 192.168.33.100
+    database_port: ~
+    database_name: wearemarketing_test
+    database_user: user
+    database_password: pass
+
+    locale: en
