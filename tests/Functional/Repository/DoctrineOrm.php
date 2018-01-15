@@ -2,6 +2,7 @@
 
 namespace Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Functional\Repository;
 
+use Doctrine\ORM\NoResultException;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Functional\RepositoryInterface;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Blog;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\BlogTranslation;
@@ -66,7 +67,16 @@ class DoctrineOrm implements RepositoryInterface
 
     public function findRoutesForBlog($blog)
     {
-        return [];
+        $this->getObjectManager()->clear();
+
+        try {
+            $blog = $this->findBlog($blog->getTitle());
+            $routes = $blog->getRoutes();
+        } catch (NoResultException $e) {
+            return [];
+        }
+
+        return $routes;
     }
 
     public function findAutoRoute($url)

@@ -183,18 +183,22 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
 
     public function testRemoveBlog()
     {
-        $this->markTestSkipped("Working...");
-        $this->createBlog();
-        $blog = $this->getDm()->find(null, '/test/test-blog');
+        /** @var DoctrineOrm $repository */
+        $repository = $this->getRepository();
+        $repository->createBlog();
+
+        $blog = $repository->findBlog('Unit testing blog');
 
         // test removing
-        $this->getDm()->remove($blog);
+        $this->getObjectManager()->remove($blog);
 
-        $this->getDm()->flush();
+        $this->getObjectManager()->flush();
 
-        $baseRoute = $this->getDm()->find(null, '/test/auto-route/blog');
-        $routes = $this->getDm()->getChildren($baseRoute);
-        $this->assertCount(0, $routes);
+        $routes = $repository->findRoutesForBlog($blog);
+        $this->assertEmpty($routes);
+
+        // We should test when the blog has post. But it will be the same for ass
+        // because we do not propagate the changes to children
     }
 
     public function testPersistPost()
