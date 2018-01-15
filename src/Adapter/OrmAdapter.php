@@ -151,7 +151,7 @@ class OrmAdapter implements AdapterInterface
         $headRoute->setDefaults($defaults);
         $headRoute->setSeoMetaData($seoMetaData);
 
-        //Route name is compound by: table name, row id, locale if present, type, epoch time
+        //Route name is compound by: table name, row id, locale if present, type, unique id
         $routeNameParts = array_merge(
             array($metadata->getTableName()),
             $id ? array_values($id) : array(self::ID_PLACEHOLDER)
@@ -169,7 +169,7 @@ class OrmAdapter implements AdapterInterface
             $routeNameParts[] = $autoRouteTag;
         }
 
-        $routeNameParts[] = time();
+        $routeNameParts[] = uniqid();
         $headRoute->setName(implode('_', $routeNameParts));
 
         return $headRoute;
