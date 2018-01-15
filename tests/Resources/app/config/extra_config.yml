@@ -39,12 +39,12 @@ sonata_media:
             create:     false
 
 services:
-    wam_routing.content.router_enhancer:
-        class: WAM\Bundle\RoutingBundle\Enhancer\ContentRouteEnhancer
-        public: false
-        arguments: [ '@doctrine.orm.entity_manager' ]
-        tags:
-            - { name: "dynamic_router_route_enhancer", priority: 255 }
+#    wam_routing.content.router_enhancer:
+#        class: WAM\Bundle\RoutingBundle\Enhancer\ContentRouteEnhancer
+#        public: false
+#        arguments: [ '@doctrine.orm.entity_manager' ]
+#        tags:
+#            - { name: "dynamic_router_route_enhancer", priority: 255 }
 
 parameters:
     cmf_routing.auto_route_entity.class: WAM\Bundle\RoutingBundle\Entity\AutoRoute

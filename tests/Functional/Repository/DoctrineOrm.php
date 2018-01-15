@@ -5,9 +5,8 @@ namespace Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Functional\Repository;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Functional\RepositoryInterface;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Blog;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\BlogTranslation;
+use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Post;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Document\Post;
-use Symfony\Cmf\Bundle\RoutingBundle\Doctrine\Orm\Route;
 use WAM\Bundle\RoutingBundle\Entity\AutoRoute;
 
 class DoctrineOrm implements RepositoryInterface
@@ -34,10 +33,10 @@ class DoctrineOrm implements RepositoryInterface
 
         if ($withPosts) {
             $post = new Post();
-            $post->name = 'This is a post title';
-            $post->title = 'This is a post title';
-            $post->blog = $blog;
-            $post->date = new \DateTime('2013/03/21');
+            $post->setTitle('This is a post title');
+            $post->setBlog($blog);
+            $post->setDate(new \DateTime('2013/03/21'));
+            $post->mergeNewTranslations();
             $this->getObjectManager()->persist($post);
         }
 
@@ -53,7 +52,6 @@ class DoctrineOrm implements RepositoryInterface
     public function findBlog($blogName)
     {
         $objectManager = $this->getObjectManager();
-        $repository = $objectManager->getRepository(BlogTranslation::class);
 
         $query = $objectManager->createQuery("
             SELECT b FROM Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Blog b 
@@ -81,5 +79,20 @@ class DoctrineOrm implements RepositoryInterface
         return $repository->findBy([
             'staticPrefix' => $url
         ]);
+    }
+
+    public function findPost($title)
+    {
+        $objectManager = $this->getObjectManager();
+        $query = $objectManager->createQuery("
+            SELECT p FROM Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Post p 
+            INNER JOIN Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\PostTranslation pt
+            WHERE pt.title = :title
+        ");
+
+        $query->setParameter(':title', $title);
+        $blog = $query->getSingleResult();
+
+        return $blog;
     }
 }
