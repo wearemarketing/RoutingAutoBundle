@@ -207,18 +207,25 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
 
     public function testPersistPost()
     {
-        $this->markTestSkipped("Working...");
-        $this->createBlog(true);
-        $route = $this->getDm()->find(null, '/test/auto-route/blog/unit-testing-blog/2013/03/21/this-is-a-post-title');
+        /** @var DoctrineOrm $repository */
+        $repository = $this->getRepository();
+        $repository->createBlog(true);
+
+        $route = $repository->findAutoRoute('/blog/unit-testing-blog/2013/03/21/this-is-a-post-title');
         $this->assertNotNull($route);
 
         // make sure auto-route references content
-        $post = $this->getDm()->find(null, '/test/test-blog/This is a post title');
-        $routes = $this->getDm()->getReferrers($post);
-
+        /** @var Post $post */
+        $post = $repository->findPost('This is a post title');
+        $routes = $post->getRoutes();
         $this->assertCount(1, $routes);
-        $this->assertInstanceOf('Symfony\Cmf\Bundle\RoutingAutoBundle\Model\AutoRoute', $routes[0]);
-        $this->assertEquals('this-is-a-post-title', $routes[0]->getName());
+        /** @var AutoRoute $route */
+        $route = $routes[0];
+
+        $this->assertSame(get_class($post), $route->getContentClass());
+        $this->assertEquals(['id' => $post->getId()], $route->getContentId());
+        $this->assertInstanceOf(AutoRoute::class, $route);
+        $this->assertContains('Post_'.$post->getId().'_en_', $route->getName());
     }
 
     public function testUpdatePost()
