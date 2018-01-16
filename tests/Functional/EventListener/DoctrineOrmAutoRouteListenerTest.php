@@ -358,8 +358,9 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
 
     public function testMultilangArticleRemainsSameLocale()
     {
-        $this->markTestSkipped("Working...");
+        $this->markTestSkipped("I think this feature we don't have it...");
         $article = new Article();
+        $article->setTitle('Article 1');
         $article->path = '/test/article-1';
         $article->title = 'Good Day';
         $this->getDm()->persist($article);
@@ -549,7 +550,7 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
      */
     public function testLeaveRedirectChildrenMigrations()
     {
-        $this->markTestSkipped("Is tested in the testUpdateRenameBlog. At the moment we do not propagate the changes to children");
+        $this->markTestSkipped("It is tested in the testUpdateRenameBlog. At the moment we do not propagate the changes to children");
     }
 
     /**
