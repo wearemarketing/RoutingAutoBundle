@@ -13,6 +13,7 @@ namespace Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Functional\EventListener;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Functional\Repository\DoctrineOrm;
+use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Article;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\ConcreteContent;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Blog;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Post;
@@ -269,20 +270,20 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
                     'es' => 'Hola todo el mundo',
                 ],
                 [
-                    'test/auto-route/articles/en/hello-everybody',
-                    'test/auto-route/articles/fr/bonjour-le-monde',
-                    'test/auto-route/articles/de/gutentag',
-                    'test/auto-route/articles/es/hola-todo-el-mundo',
+                    '/articles/en-gb/hello-everybody',
+                    '/articles/fr-fr/bonjour-le-monde',
+                    '/articles/de-de/gutentag',
+                    '/articles/hola-todo-el-mundo',
 
-                    'test/auto-route/articles/en/hello-everybody-edit',
-                    'test/auto-route/articles/fr/bonjour-le-monde-edit',
-                    'test/auto-route/articles/de/gutentag-edit',
-                    'test/auto-route/articles/es/hola-todo-el-mundo-edit',
+                    '/articles/en-gb/hello-everybody-edit',
+                    '/articles/fr-fr/bonjour-le-monde-edit',
+                    '/articles/de-de/gutentag-edit',
+                    '/articles/hola-todo-el-mundo-edit',
 
-                    'test/auto-route/articles/en/hello-everybody-review',
-                    'test/auto-route/articles/fr/bonjour-le-monde-review',
-                    'test/auto-route/articles/de/gutentag-review',
-                    'test/auto-route/articles/es/hola-todo-el-mundo-review',
+                    '/articles/en-gb/hello-everybody-review',
+                    '/articles/fr-fr/bonjour-le-monde-review',
+                    '/articles/de-de/gutentag-review',
+                    '/articles/hola-todo-el-mundo-review',
                 ],
             ],
         ];
@@ -293,38 +294,45 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
      */
     public function testMultilangArticle($data, $expectedPaths)
     {
-        $this->markTestSkipped("Working...");
         $article = new Article();
-        $article->path = '/test/article-1';
-        $this->getDm()->persist($article);
+        $article->setTitle('Article 1');
+        $article->mergeNewTranslations();
+        $this->getObjectManager()->persist($article);
 
         foreach ($data as $lang => $title) {
-            $article->title = $title;
-            $this->getDm()->bindTranslation($article, $lang);
+            $article->setLocale($lang);
+            $article->setTitle($title);
         }
 
-        $this->getDm()->flush();
-        $this->getDm()->clear();
+        $article->mergeNewTranslations();
+
+        $this->getObjectManager()->persist($article);
+        $this->getObjectManager()->flush();
+        $this->getObjectManager()->clear();
 
         $locales = array_keys($data);
 
+        /** @var DoctrineOrm $repository */
+        $repository = $this->getRepository();
         foreach ($expectedPaths as $i => $expectedPath) {
             $localeIndex = $i % count($locales);
             $expectedLocale = $locales[$localeIndex];
 
-            $route = $this->getDm()->find(null, $expectedPath);
+            /** @var AutoRoute $route */
+            $route = $repository->findAutoRoute($expectedPath);
 
             $this->assertNotNull($route, 'Route: '.$expectedPath);
-            $this->assertInstanceOf('Symfony\Cmf\Bundle\RoutingAutoBundle\Model\AutoRoute', $route);
+            $this->assertInstanceOf(AutoRoute::class, $route);
             $this->assertEquals($expectedLocale, $route->getLocale());
 
-            $content = $route->getContent();
+            /** @var Article $content */
+            $content = $repository->findContent($route);
 
             $this->assertNotNull($content);
-            $this->assertInstanceOf('Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Document\Article', $content);
+            $this->assertInstanceOf(Article::class, $content);
 
-            // We havn't loaded the translation for the document, so it is always in the default language
-            $this->assertEquals('Hello everybody!', $content->title);
+            // We haven't loaded the translation for the document, so it is always in the default language
+            $this->assertEquals('Hello everybody!', $content->getTitle());
         }
     }
 
@@ -339,10 +347,10 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
                     'es' => 'Hola todo el mundo',
                 ],
                 [
-                    'test/auto-route/articles/en/hello-everybody',
-                    'test/auto-route/articles/fr/bonjour-le-monde',
-                    'test/auto-route/articles/de/gutentag-und-auf-wiedersehen',
-                    'test/auto-route/articles/es/hola-todo-el-mundo',
+                    'test/auto-route/articles/en-gb/hello-everybody',
+                    'test/auto-route/articles/fr-fr/bonjour-le-monde',
+                    'test/auto-route/articles/de-de/gutentag-und-auf-wiedersehen',
+                    'test/auto-route/articles/hola-todo-el-mundo',
                 ],
             ],
         ];
@@ -461,7 +469,7 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
                     'test/auto-route/seo-articles/en/hello-everybody',
                     'test/auto-route/seo-articles/fr/bonjour-le-monde',
                     'test/auto-route/seo-articles/de/gutentag',
-                    'test/auto-route/seo-articles/es/hola-todo-el-mundo',
+                    'test/auto-route/seo-articles/hola-todo-el-mundo',
                 ],
                 [
                     'test/auto-route/seo-articles/en/goodbye-everybody',

@@ -21,6 +21,25 @@ Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Post:
     conflict_resolver: auto_increment
     defunct_route_handler: leave_redirect
 
+Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Article:
+    definitions:
+        view:
+            uri_schema: /articles/{locale}/{article_title}
+            defaults:
+                _type: article_view
+        edit:
+            uri_schema: /articles/{locale}/{article_title}-edit
+            defaults:
+                _type: article_edit
+        review:
+            uri_schema: /articles/{locale}/{article_title}-review
+            defaults:
+                _type: article_review
+    token_providers:
+        article_title: [content_method, { method: getTitle } ]
+        locale: [wam_content_locale, { allow_empty: true } ]
+
+
 # AbstractContent for ensuring that parent class mapping works
 Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\AbstractContent:
     definitions:

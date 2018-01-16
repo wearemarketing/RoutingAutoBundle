@@ -2,7 +2,7 @@ imports:
     - { resource: '../../../../vendor/knplabs/doctrine-behaviors/config/orm-services.yml' }
 
 wam_locale:
-    locales: [ es, en ]
+    locales: [ es, en, fr, de ]
     guess_locale: false
     locale_switcher_mode: redirect_to_home
     fallback:
@@ -20,6 +20,14 @@ wam_locale:
             hreflang: en_GB
             url: en-gb
             label: English
+        fr:
+            hreflang: fr_FR
+            url: fr-fr
+            label: French
+        de:
+            hreflang: de-DE
+            url: de-de
+            label: German
 
 wam_banner:
     zones: {TOP: TOP, FOOTER: FOOTER}
