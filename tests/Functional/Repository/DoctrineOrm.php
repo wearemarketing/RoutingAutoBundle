@@ -5,7 +5,6 @@ namespace Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Functional\Repository;
 use Doctrine\ORM\NoResultException;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Functional\RepositoryInterface;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Blog;
-use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\BlogTranslation;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Post;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use WAM\Bundle\RoutingBundle\Entity\AutoRoute;

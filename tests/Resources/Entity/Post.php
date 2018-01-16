@@ -25,6 +25,13 @@ class Post extends ModelPost implements RouteReferrersInterface, TranslatableInt
     protected $id;
 
     /**
+     * @ORM\Column(type="text", nullable=true)
+     *
+     * @var string
+     */
+    protected $body;
+
+    /**
      * @ORM\Column(type="date")
      *
      * @var \DateTime
@@ -57,6 +64,8 @@ class Post extends ModelPost implements RouteReferrersInterface, TranslatableInt
     public function setBlog($blog)
     {
         $this->blog = $blog;
+
+        return $this;
     }
 
     /**
@@ -73,11 +82,31 @@ class Post extends ModelPost implements RouteReferrersInterface, TranslatableInt
     public function setTitle($title)
     {
         $this->translate(null, false)->setTitle($title);
+
+        return $this;
     }
 
     public function getBlogTitle()
     {
         return $this->getBlog()->getTitle();
+    }
+
+    /**
+     * @return string
+     */
+    public function getBody()
+    {
+        return $this->body;
+    }
+
+    /**
+     * @param string $body
+     */
+    public function setBody($body)
+    {
+        $this->body = $body;
+
+        return $this;
     }
 
     /**

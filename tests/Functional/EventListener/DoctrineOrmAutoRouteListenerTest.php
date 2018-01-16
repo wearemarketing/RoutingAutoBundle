@@ -160,25 +160,29 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
 
     public function testUpdatePostNotChangingTitle()
     {
-        $this->markTestSkipped("Working...");
-        $this->createBlog(true);
+        /** @var DoctrineOrm $repository */
+        $repository = $this->getRepository();
+        $repository->createBlog(true);
 
-        $post = $this->getDm()->find(null, '/test/test-blog/This is a post title');
+        /** @var Post $post */
+        $post = $repository->findPost('This is a post title');
         $this->assertNotNull($post);
 
-        $post->body = 'Test';
+        $post->setBody('Test');
 
-        $this->getDm()->persist($post);
-        $this->getDm()->flush();
-        $this->getDm()->clear();
+        $this->getObjectManager()->persist($post);
+        $this->getObjectManager()->flush();
+        $this->getObjectManager()->clear();
 
-        $post = $this->getDm()->find(null, '/test/test-blog/This is a post title');
-        $routes = $post->routes;
+        $post = $repository->findPost('This is a post title');
+        $routes = $post->getRoutes();
 
         $this->assertCount(1, $routes);
-        $this->assertInstanceOf('Symfony\Cmf\Bundle\RoutingAutoBundle\Model\AutoRoute', $routes[0]);
+        /** @var AutoRoute $route */
+        $route = $routes[0];
+        $this->assertInstanceOf(AutoRoute::class, $route);
 
-        $this->assertEquals('this-is-a-post-title', $routes[0]->getName());
+        $this->assertEquals('/blog/unit-testing-blog/2013/03/21/this-is-a-post-title', $route->getStaticPrefix());
     }
 
     public function testRemoveBlog()
