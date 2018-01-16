@@ -2,6 +2,7 @@
 
 namespace Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Functional\Repository;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\NoResultException;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Functional\RepositoryInterface;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Blog;
@@ -102,5 +103,29 @@ class DoctrineOrm implements RepositoryInterface
         $post = $query->getSingleResult();
 
         return $post;
+    }
+
+    public function findRoutesForPost(Post $post)
+    {
+        $repository = $this
+            ->getObjectManager()
+            ->getRepository(AutoRoute::class);
+
+        $contentId = ['id' => $post->getId()];
+
+        $routes = $repository->findBy([
+            'contentClass' => get_class($post)
+        ]);
+
+        $routesCollection = new ArrayCollection($routes);
+        $routes = $routesCollection->filter(function ($route) use ($contentId) {
+            if ($route->getContentId() === $contentId) {
+                return true;
+            }
+
+            return false;
+        });
+
+        return $routes->toArray();
     }
 }

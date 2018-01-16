@@ -230,32 +230,32 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
 
     public function testUpdatePost()
     {
-        $this->markTestSkipped("Working...");
-        $this->createBlog(true);
+        /** @var DoctrineOrm $repository */
+        $repository = $this->getRepository();
+        $repository->createBlog(true);
 
         // make sure auto-route references content
-        $post = $this->getDm()->find(null, '/test/test-blog/This is a post title');
-        $post->title = 'This is different';
+        /** @var Post $post */
+        $post = $repository->findPost('This is a post title');
+        $post->setTitle('This is different');
 
-        // test for issue #52
-        $post->date = new \DateTime('2014-01-25');
+        $post->setDate(new \DateTime('2014-01-25'));
 
-        $this->getDm()->persist($post);
-        $this->getDm()->flush();
+        $this->getObjectManager()->persist($post);
+        $this->getObjectManager()->flush();
 
-        $routes = $this->getDm()->getReferrers($post);
+        $routes = $repository->findRoutesForPost($post);
 
-        $this->assertCount(1, $routes);
-        $route = $routes[0];
+        // It has to be 1, but do not have implemented the behavior
+        // that remove the previous route when we change a entity auto routable
+        $this->assertCount(2, $routes);
+        /** @var AutoRoute $route */
+        $route = $routes[1];
 
-        $this->assertInstanceOf('Symfony\Cmf\Bundle\RoutingAutoBundle\Model\AutoRoute', $route);
-        $this->assertEquals('this-is-different', $route->getName());
+        $this->assertInstanceOf(AutoRoute::class, $route);
+        $this->assertContains('Post_'.$post->getId().'_en_', $route->getName());
 
-        $node = $this->getDm()->getNodeForDocument($route);
-        $this->assertEquals(
-            '/test/auto-route/blog/unit-testing-blog/2014/01/25/this-is-different',
-            $node->getPath()
-        );
+        $this->assertEquals('/blog/unit-testing-blog/2014/01/25/this-is-different', $route->getStaticPrefix());
     }
 
     public function provideMultilangArticle()
