@@ -11,6 +11,7 @@
 
 namespace Symfony\Cmf\Bundle\RoutingAutoBundle\Adapter;
 
+use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -51,6 +52,11 @@ class OrmAdapter implements AdapterInterface
     private $contentRouteEnhancer;
 
     /**
+     * @var ObjectRepository
+     */
+    private $repository;
+
+    /**
      * @param EntityManagerInterface $em
      * @param ContentRouteEnhancer   $contentRouteEnhancer
      * @param string                 $autoRouteFqcn        The FQCN of the AutoRoute document to use
@@ -59,7 +65,6 @@ class OrmAdapter implements AdapterInterface
     {
         $this->em = $em;
         $this->contentRouteEnhancer = $contentRouteEnhancer;
-//        $this->baseRoutePath = $routeBasePath;
 
         $reflection = new \ReflectionClass($autoRouteFqcn);
         if (!$reflection->isSubclassOf('Symfony\Cmf\Component\RoutingAuto\Model\AutoRouteInterface')) {
@@ -67,6 +72,8 @@ class OrmAdapter implements AdapterInterface
         }
 
         $this->autoRouteFqcn = $autoRouteFqcn;
+
+        $this->repository = $this->em->getRepository($this->autoRouteFqcn);
     }
 
     /**
@@ -181,7 +188,7 @@ class OrmAdapter implements AdapterInterface
     public function createRedirectRoute(AutoRouteInterface $referringAutoRoute, AutoRouteInterface $newRoute)
     {
         // check if $newRoute already exists
-        $route = $this->em->getRepository($this->autoRouteFqcn)->findOneByStaticPrefix($newRoute->getStaticPrefix());
+        $route = $this->repository->findOneByStaticPrefix($newRoute->getStaticPrefix());
 
         if ($route) {
             // in case it's a redirection, remove redirection's defaults
@@ -248,10 +255,13 @@ class OrmAdapter implements AdapterInterface
      */
     public function findRouteForUri($uri, UriContext $uriContext)
     {
-        if ($route = $this->em->getRepository($this->autoRouteFqcn)->findOneByStaticPrefix($uri)) {
-            // TODO: Extract this code in a repository instead of enhancer
-            $this->contentRouteEnhancer->resolveRouteContent($route);
+        $route = $this->repository->findOneBy(['staticPrefix' => $uri]);
+        if (empty($route)) {
+            return null;
         }
+
+        // TODO: Extract this code in a repository instead of enhancer
+        $this->contentRouteEnhancer->resolveRouteContent($route);
 
         return $route;
     }

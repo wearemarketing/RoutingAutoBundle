@@ -47,9 +47,11 @@ class ContentRouteEnhancer implements RouteEnhancerInterface
     /**
      * Resolves the route content.
      *
+     * TODO: Add type hinting. Extract methods in a model class or create interface
+     *
      * @param Route $routeObject
      */
-    public function resolveRouteContent(AutoRoute $routeObject)
+    public function resolveRouteContent($routeObject)
     {
         // TODO: Extract this code in a repository instead of enhancer
 

@@ -17,13 +17,13 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Adapter\OrmAdapter;
+use Symfony\Cmf\Bundle\RoutingAutoBundle\Entity\AutoRoute;
 use Symfony\Cmf\Component\Routing\RouteReferrersInterface;
 use Symfony\Cmf\Component\RoutingAuto\Mapping\Exception\ClassNotMappedException;
 use Symfony\Cmf\Component\RoutingAuto\Model\AutoRouteInterface;
 use Symfony\Cmf\Component\RoutingAuto\UriContextCollection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use WAM\Bundle\CoreBundle\Model\TranslationInterface;
-use WAM\Bundle\RoutingBundle\Entity\AutoRoute;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
