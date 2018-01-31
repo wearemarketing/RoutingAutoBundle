@@ -71,6 +71,9 @@ class CmfRoutingAutoExtension extends Extension
             if (null === $adapterName) {
                 $adapterName = 'doctrine_orm';
             }
+
+            $fqcn = $config['persistence']['orm']['class'];
+            $container->setParameter('cmf_routing_auto.auto_route_entity.class', $fqcn);
         }
 
         if (false === $hasProvider && null === $adapterName) {

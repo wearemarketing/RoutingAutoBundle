@@ -11,6 +11,7 @@
 
 namespace Symfony\Cmf\Bundle\RoutingAutoBundle\DependencyInjection;
 
+use Symfony\Cmf\Bundle\RoutingAutoBundle\Entity\AutoRoute;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -72,6 +73,9 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('orm')
                     ->addDefaultsIfNotSet()
                     ->canBeEnabled()
+                    ->children()
+                        ->scalarNode('class')->defaultValue(AutoRoute::class)
+                    ->end()
                 ->end() // orm
             ->end();
 

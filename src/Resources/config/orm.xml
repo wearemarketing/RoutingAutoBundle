@@ -4,12 +4,16 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="cmf_routing_auto.enhancer.orm.content_router" class="Symfony\Cmf\Bundle\RoutingAutoBundle\Enhancer\ContentRouteEnhancer">
+            <argument type="service" id="doctrine.orm.entity_manager"/>
+            <tag name="dynamic_router_route_enhancer"/>
+        </service>
+
         <!-- Adapters -->
-        <!--todo este servicio está acoplado a wam/wam/routingBundle por el enhancer-->
         <service id="cmf_routing_auto.adapter.orm" class="Symfony\Cmf\Bundle\RoutingAutoBundle\Adapter\OrmAdapter">
             <argument type="service" id="doctrine.orm.entity_manager"/>
-            <argument type="service" id="wam_routing.content.router_enhancer"/>
-            <argument>%cmf_routing.auto_route_entity.class%</argument>
+            <argument type="service" id="cmf_routing_auto.enhancer.orm.content_router"/>
+            <argument>%cmf_routing_auto.auto_route_entity.class%</argument>
             <tag name="cmf_routing_auto.adapter" alias="doctrine_orm" />
         </service>
 

@@ -15,11 +15,11 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Symfony\Cmf\Bundle\CoreBundle\Translatable\TranslatableInterface;
+use Symfony\Cmf\Bundle\RoutingAutoBundle\Enhancer\ContentRouteEnhancer;
+use Symfony\Cmf\Bundle\RoutingAutoBundle\Entity\AutoRoute;
 use Symfony\Cmf\Component\RoutingAuto\AdapterInterface;
 use Symfony\Cmf\Component\RoutingAuto\Model\AutoRouteInterface;
 use Symfony\Cmf\Component\RoutingAuto\UriContext;
-use WAM\Bundle\RoutingBundle\Enhancer\ContentRouteEnhancer;
-use WAM\Bundle\RoutingBundle\Entity\AutoRoute;
 use WAM\Bundle\RoutingBundle\Model\SeoMetaReadInterface;
 
 /**
@@ -55,7 +55,7 @@ class OrmAdapter implements AdapterInterface
      * @param ContentRouteEnhancer   $contentRouteEnhancer
      * @param string                 $autoRouteFqcn        The FQCN of the AutoRoute document to use
      */
-    public function __construct(EntityManagerInterface $em, ContentRouteEnhancer $contentRouteEnhancer, $autoRouteFqcn = 'WAM\Bundle\RoutingBundle\Entity\AutoRoute')
+    public function __construct(EntityManagerInterface $em, ContentRouteEnhancer $contentRouteEnhancer, $autoRouteFqcn)
     {
         $this->em = $em;
         $this->contentRouteEnhancer = $contentRouteEnhancer;
@@ -249,6 +249,7 @@ class OrmAdapter implements AdapterInterface
     public function findRouteForUri($uri, UriContext $uriContext)
     {
         if ($route = $this->em->getRepository($this->autoRouteFqcn)->findOneByStaticPrefix($uri)) {
+            // TODO: Extract this code in a repository instead of enhancer
             $this->contentRouteEnhancer->resolveRouteContent($route);
         }
 
