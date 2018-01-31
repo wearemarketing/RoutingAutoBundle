@@ -126,11 +126,11 @@ class OrmAdapter implements AdapterInterface
         $seoMetaData = array('title' => '', 'description' => '', 'metaKeywords' => '');
         $contentDocument = $uri->getSubject();
 
-        foreach ($contentDocument->getRoutes() as $item) {
-            if ($this->isPrimaryAndSameLocale($autoRouteTag, $item, $contentDocument)) {
-                $this->updateSeoData($contentDocument, $item);
+        foreach ($contentDocument->getRoutes() as $route) {
+            if ($this->isPrimaryAndSameLocale($autoRouteTag, $route)) {
+                $this->updateSeoData($contentDocument, $route);
 
-                $seoMetaData = $item->getSeoMetaData();
+                $seoMetaData = $route->getSeoMetaData();
             }
         }
 
@@ -257,13 +257,13 @@ class OrmAdapter implements AdapterInterface
 
     /**
      * @param $autoRouteTag
-     * @param $item
+     * @param $route
      *
      * @return bool
      */
-    protected function isPrimaryAndSameLocale($autoRouteTag, $item)
+    protected function isPrimaryAndSameLocale($autoRouteTag, $route)
     {
-        return AutoRouteInterface::TYPE_PRIMARY == $item->getType() && $autoRouteTag == $item->getTag();
+        return AutoRouteInterface::TYPE_PRIMARY == $route->getType() && $autoRouteTag == $route->getTag();
     }
 
     /**
