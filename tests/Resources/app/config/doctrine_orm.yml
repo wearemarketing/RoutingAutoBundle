@@ -18,6 +18,7 @@ cmf_routing_auto:
             enabled: false
         orm:
             enabled: true
+#            class: WAM\Bundle\RoutingBundle\Entity\AutoRoute
     mapping:
         resources:
             - "%kernel.root_dir%/config/doctrine_orm_routing_auto.yml"

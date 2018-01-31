@@ -12,13 +12,13 @@
 namespace Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Functional\EventListener;
 
 use Doctrine\Common\Persistence\ObjectManager;
+use Symfony\Cmf\Bundle\RoutingAutoBundle\Entity\AutoRoute;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Functional\Repository\DoctrineOrm;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Article;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\ConcreteContent;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Blog;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Post;
 use Symfony\Cmf\Component\Testing\Functional\DbManager\ORM;
-use WAM\Bundle\RoutingBundle\Entity\AutoRoute;
 
 /**
  * @group orm
@@ -270,20 +270,20 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
                     'es' => 'Hola todo el mundo',
                 ],
                 [
-                    '/articles/en-gb/hello-everybody',
-                    '/articles/fr-fr/bonjour-le-monde',
-                    '/articles/de-de/gutentag',
-                    '/articles/hola-todo-el-mundo',
+                    '/articles/en/hello-everybody',
+                    '/articles/fr/bonjour-le-monde',
+                    '/articles/de/gutentag',
+                    '/articles/es/hola-todo-el-mundo',
 
-                    '/articles/en-gb/hello-everybody-edit',
-                    '/articles/fr-fr/bonjour-le-monde-edit',
-                    '/articles/de-de/gutentag-edit',
-                    '/articles/hola-todo-el-mundo-edit',
+                    '/articles/en/hello-everybody-edit',
+                    '/articles/fr/bonjour-le-monde-edit',
+                    '/articles/de/gutentag-edit',
+                    '/articles/es/hola-todo-el-mundo-edit',
 
-                    '/articles/en-gb/hello-everybody-review',
-                    '/articles/fr-fr/bonjour-le-monde-review',
-                    '/articles/de-de/gutentag-review',
-                    '/articles/hola-todo-el-mundo-review',
+                    '/articles/en/hello-everybody-review',
+                    '/articles/fr/bonjour-le-monde-review',
+                    '/articles/de/gutentag-review',
+                    '/articles/es/hola-todo-el-mundo-review',
                 ],
             ],
         ];

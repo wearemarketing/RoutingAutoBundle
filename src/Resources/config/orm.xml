@@ -4,6 +4,11 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="cmf_routing_auto.listener.orm.routes" class="Symfony\Cmf\Bundle\RoutingAutoBundle\Listener\RouteListener">
+            <argument>%cmf_routing_auto.auto_route_entity.class%</argument>
+            <tag name="doctrine.event_listener" event="postLoad"/>
+        </service>
+
         <service id="cmf_routing_auto.enhancer.orm.content_router" class="Symfony\Cmf\Bundle\RoutingAutoBundle\Enhancer\ContentRouteEnhancer">
             <argument type="service" id="doctrine.orm.entity_manager"/>
             <tag name="dynamic_router_route_enhancer"/>

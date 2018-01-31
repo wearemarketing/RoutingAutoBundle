@@ -37,7 +37,7 @@ Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Article:
                 _type: article_review
     token_providers:
         article_title: [content_method, { method: getTitle } ]
-        locale: [wam_content_locale, { allow_empty: true } ]
+        locale: [content_locale, { allow_empty: true } ]
 
 
 # AbstractContent for ensuring that parent class mapping works

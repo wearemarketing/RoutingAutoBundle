@@ -13,6 +13,7 @@ namespace Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Functional\Command;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Command\RefreshOrmCommand;
+use Symfony\Cmf\Bundle\RoutingAutoBundle\Entity\AutoRoute;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Functional\OrmBaseTestCase;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Functional\Repository\DoctrineOrm;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Blog;
@@ -20,7 +21,6 @@ use Symfony\Cmf\Component\Testing\Functional\DbManager\ORM;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\StreamOutput;
-use WAM\Bundle\RoutingBundle\Entity\AutoRoute;
 
 /**
  * @group orm
