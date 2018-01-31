@@ -3,19 +3,43 @@
 namespace Symfony\Cmf\Bundle\RoutingAutoBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Cmf\Bundle\RoutingBundle\Doctrine\Orm\Route;
+use Symfony\Cmf\Bundle\RoutingBundle\Model\Route;
 use Symfony\Cmf\Component\RoutingAuto\Model\AutoRouteInterface;
 
 /**
  * @ORM\Entity()
- * @ORM\Table(name="orm_auto_route")
- *
- * @author Noel Garcia <ngarcia@wearemarketing.com>
+ * @ORM\Table(name="orm_auto_routes")
  */
 class AutoRoute extends Route implements AutoRouteInterface
 {
     const CONTENT_CLASS_KEY = 'contentClass';
     const CONTENT_ID_KEY = 'contentId';
+
+
+    /**
+     * Identifier.
+     *
+     * @var int
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    protected $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="name", type="string", unique=true)
+     */
+    protected $name;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="position", type="integer")
+     */
+    protected $position = 0;
 
     /**
      * @ORM\Column(type="string", length=100)
@@ -52,11 +76,6 @@ class AutoRoute extends Route implements AutoRouteInterface
      */
     protected $tag;
 
-    /**
-     * AutoRoute constructor.
-     *
-     *
-     */
     public function __construct(array $options = [])
     {
         parent::__construct($options);
@@ -70,6 +89,86 @@ class AutoRoute extends Route implements AutoRouteInterface
     public function __toString()
     {
         return $this->getPath();
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Sets the name.
+     *
+     * @param string $name
+     *
+     * @return self
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Gets the name.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Set the sort order of this route.
+     *
+     * @param int $position
+     *
+     * @return self
+     */
+    public function setPosition($position)
+    {
+        $this->position = $position;
+
+        return $this;
+    }
+
+    /**
+     * Get the sort order of this route.
+     *
+     * @return int
+     */
+    public function getPosition()
+    {
+        return $this->position;
+    }
+
+    /**
+     * Getter for CanonicalName.
+     *
+     * @return string
+     */
+    public function getCanonicalName()
+    {
+        return $this->canonicalName;
+    }
+
+    /**
+     * Setter for CanonicalName.
+     *
+     * @param string $canonicalName
+     *
+     * @return $this
+     */
+    public function setCanonicalName($canonicalName)
+    {
+        $this->canonicalName = $canonicalName;
+
+        return $this;
     }
 
     /**
@@ -190,5 +289,21 @@ class AutoRoute extends Route implements AutoRouteInterface
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * @param string $tag
+     */
+    public function setTag($tag)
+    {
+        $this->tag = $tag;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTag()
+    {
+        return $this->tag;
     }
 }
