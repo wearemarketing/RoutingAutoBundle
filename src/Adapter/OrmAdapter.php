@@ -137,7 +137,7 @@ class OrmAdapter implements AdapterInterface
             if ($this->isPrimaryAndSameLocale($autoRouteTag, $route)) {
                 $this->updateSeoData($contentDocument, $route);
 
-                $seoMetaData = $route->getSeoMetaData();
+//                $seoMetaData = $route->getSeoMetaData();
             }
         }
 
@@ -156,7 +156,7 @@ class OrmAdapter implements AdapterInterface
         $headRoute->setContentClass($documentClassName);
         $headRoute->setContentId($id);
         $headRoute->setDefaults($defaults);
-        $headRoute->setSeoMetaData($seoMetaData);
+//        $headRoute->setSeoMetaData($seoMetaData);
 
         //Route name is compound by: table name, row id, locale if present, type, unique id
         $routeNameParts = array_merge(
@@ -262,7 +262,7 @@ class OrmAdapter implements AdapterInterface
 
         // TODO: Extract this code in a repository instead of enhancer
         $this->contentRouteEnhancer->resolveRouteContent($route);
-
+        
         return $route;
     }
 
