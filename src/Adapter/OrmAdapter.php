@@ -21,7 +21,6 @@ use Symfony\Cmf\Bundle\RoutingAutoBundle\Entity\AutoRoute;
 use Symfony\Cmf\Component\RoutingAuto\AdapterInterface;
 use Symfony\Cmf\Component\RoutingAuto\Model\AutoRouteInterface;
 use Symfony\Cmf\Component\RoutingAuto\UriContext;
-use WAM\Bundle\RoutingBundle\Model\SeoMetaReadInterface;
 
 /**
  * Adapter for ORM.
@@ -135,7 +134,7 @@ class OrmAdapter implements AdapterInterface
 
         foreach ($contentDocument->getRoutes() as $route) {
             if ($this->isPrimaryAndSameLocale($autoRouteTag, $route)) {
-                $this->updateSeoData($contentDocument, $route);
+//                $this->updateSeoData($contentDocument, $route);
 
 //                $seoMetaData = $route->getSeoMetaData();
             }

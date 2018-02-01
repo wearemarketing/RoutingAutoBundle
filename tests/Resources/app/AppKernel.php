@@ -20,27 +20,6 @@ class AppKernel extends TestKernel
 
         if ($this->isOrmEnv()) {
             $this->requireBundleSet('doctrine_orm');
-
-            $this->addBundles([
-//                new \Sonata\AdminBundle\SonataAdminBundle(),
-//                new \Sonata\DoctrineORMAdminBundle\SonataDoctrineORMAdminBundle(),
-//                new \Sonata\EasyExtendsBundle\SonataEasyExtendsBundle(),
-//                new \Knp\Bundle\MenuBundle\KnpMenuBundle(),
-//                new \WAM\Bundle\RoutingBundle\WAMRoutingBundle(),
-//                new \WAM\Bundle\LocaleBundle\WAMLocaleBundle(),
-//                new \Sonata\SeoBundle\SonataSeoBundle(),
-//                new \WAM\Bundle\BlockBundle\WAMBlockBundle(),
-//                new \WAM\Bundle\BannerBundle\WAMBannerBundle(),
-//                new \Sonata\MediaBundle\SonataMediaBundle(),
-//                new \WAM\Bundle\MediaBundle\WAMMediaBundle(),
-//                new \Sonata\ClassificationBundle\SonataClassificationBundle(),
-//                new \WAM\Bundle\ClassificationBundle\WAMClassificationBundle(),
-//                new \WAM\Bundle\CoreBundle\WAMCoreBundle(),
-//                new Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),
-//                new \Sonata\UserBundle\SonataUserBundle(),
-//                new \FOS\UserBundle\FOSUserBundle(),
-//                new \WAM\Bundle\UserBundle\WAMUserBundle(),
-            ]);
         } else {
             $this->requireBundleSet('phpcr_odm');
         }

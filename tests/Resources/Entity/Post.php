@@ -5,9 +5,9 @@ namespace Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Knp\DoctrineBehaviors\Model as ORMBehaviors;
 use Symfony\Cmf\Bundle\CoreBundle\Translatable\TranslatableInterface;
+use Symfony\Cmf\Bundle\RoutingAutoBundle\Model\ORM\MultiRouteTrait;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Model\Post as ModelPost;
 use Symfony\Cmf\Component\Routing\RouteReferrersInterface;
-use WAM\Bundle\RoutingBundle\Model\MultiRouteTrait;
 
 /**
  * @ORM\Entity()

@@ -13,12 +13,11 @@ namespace Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Knp\DoctrineBehaviors\Model as ORMBehaviors;
-use WAM\Bundle\CoreBundle\Model\TranslationInterface;
 
 /**
  * @ORM\Entity()
  */
-class BlogTranslation implements TranslationInterface
+class BlogTranslation
 {
     use ORMBehaviors\Translatable\Translation;
 

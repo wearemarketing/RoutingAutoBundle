@@ -1,9 +1,5 @@
 parameters:
-    database_driver: pdo_mysql
-    database_host: 192.168.33.100
-    database_port: ~
-    database_name: wearemarketing_test
-    database_user: user
-    database_password: pass
+    database_driver: pdo_sqlite
+    database_path: '%kernel.root_dir%/cache/app.sqlite'
 
     locale: en

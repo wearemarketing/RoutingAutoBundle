@@ -16,6 +16,8 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
+use Knp\DoctrineBehaviors\Model\Translatable\Translation;
+use Knp\DoctrineBehaviors\Reflection\ClassAnalyzer;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Adapter\OrmAdapter;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Entity\AutoRoute;
 use Symfony\Cmf\Component\Routing\RouteReferrersInterface;
@@ -23,7 +25,6 @@ use Symfony\Cmf\Component\RoutingAuto\Mapping\Exception\ClassNotMappedException;
 use Symfony\Cmf\Component\RoutingAuto\Model\AutoRouteInterface;
 use Symfony\Cmf\Component\RoutingAuto\UriContextCollection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use WAM\Bundle\CoreBundle\Model\TranslationInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
@@ -35,6 +36,7 @@ class AutoRouteListener
 {
     use ContainerAwareTrait;
 
+    // TODO: remove container
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -68,10 +70,23 @@ class AutoRouteListener
         foreach ($inEntities as $entity) {
             if ($this->isAutoRouteable($entity)) {
                 $outEntities[] = $entity;
-            } else if ($entity instanceof TranslationInterface && $translatable = $entity->getTranslatable()) {
-                if (false === in_array($translatable, $inEntities, true) && $this->isAutoRouteable($translatable)) {
-                    $outEntities[] = $translatable;
-                }
+
+                continue;
+            }
+
+            $classAnalyzer = new ClassAnalyzer();
+            $reflectionClassEntity = new \ReflectionClass($entity);
+            $hasKnpTranslationTrait = $classAnalyzer->hasTrait($reflectionClassEntity, Translation::class, true);
+            if (!$hasKnpTranslationTrait) {
+                continue;
+            }
+
+            $translatableEntity = $entity->getTranslatable();
+            $isInPersistEntities = in_array($translatableEntity, $inEntities, true);
+            if (!empty($translatableEntity)
+                and !$isInPersistEntities
+                and $this->isAutoRouteable($translatableEntity)) {
+                    $outEntities[] = $translatableEntity;
             }
         }
 
