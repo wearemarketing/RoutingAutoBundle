@@ -74,19 +74,9 @@ class AutoRouteListener
                 continue;
             }
 
-            $classAnalyzer = new ClassAnalyzer();
-            $reflectionClassEntity = new \ReflectionClass($entity);
-            $hasKnpTranslationTrait = $classAnalyzer->hasTrait($reflectionClassEntity, Translation::class, true);
-            if (!$hasKnpTranslationTrait) {
-                continue;
-            }
-
-            $translatableEntity = $entity->getTranslatable();
-            $isInPersistEntities = in_array($translatableEntity, $inEntities, true);
-            if (!empty($translatableEntity)
-                and !$isInPersistEntities
-                and $this->isAutoRouteable($translatableEntity)) {
-                    $outEntities[] = $translatableEntity;
+            if ($this->isATranslationOfAnEntityAutoRoutable($inEntities, $entity)) {
+                $translatableEntity = $entity->getTranslatable();
+                $outEntities[] = $translatableEntity;
             }
         }
 
@@ -228,5 +218,37 @@ class AutoRouteListener
                 $autoRoute->$getter()
             )
         );
+    }
+
+    /**
+     * @param array $inEntities
+     * @param $entity
+     * @return boolean
+     *
+     * @throws \ReflectionException
+     */
+    private function isATranslationOfAnEntityAutoRoutable(array $inEntities, $entity)
+    {
+        $classAnalyzer = new ClassAnalyzer();
+        $reflectionClassEntity = new \ReflectionClass($entity);
+        $hasKnpTranslationTrait = $classAnalyzer->hasTrait($reflectionClassEntity, Translation::class, true);
+        if (!$hasKnpTranslationTrait) {
+            return false;
+        }
+
+        $translatableEntity = $entity->getTranslatable();
+        if (empty($translatableEntity)) {
+            return false;
+        }
+
+        if (true === in_array($translatableEntity, $inEntities, true)) {
+            return false;
+        }
+
+        if (!$this->isAutoRouteable($translatableEntity)) {
+            return false;
+        }
+
+        return true;
     }
 }
