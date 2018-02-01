@@ -51,7 +51,6 @@ class RefreshOrmCommandTest extends OrmBaseTestCase
 
         $this->updateBlogTitle($repository);
 
-
         $application = $this->getApplication();
         $input = new ArrayInput([
             '--verbose' => true,

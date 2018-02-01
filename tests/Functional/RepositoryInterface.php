@@ -2,8 +2,6 @@
 
 namespace Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Functional;
 
-use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Document\Blog;
-
 interface RepositoryInterface
 {
     public function createBlog();

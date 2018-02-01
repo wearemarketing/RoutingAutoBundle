@@ -15,7 +15,6 @@ class AutoRoute extends Route implements AutoRouteInterface
     const CONTENT_CLASS_KEY = 'contentClass';
     const CONTENT_ID_KEY = 'contentId';
 
-
     /**
      * Identifier.
      *

@@ -29,6 +29,7 @@ class OrmBaseTestCase extends TestingBaseTestCase
 //                break;
             case 'doctrine_orm':
                 $this->repository = new Repository\DoctrineOrm($container);
+
                 break;
             default:
                 throw new \RuntimeException(sprintf(

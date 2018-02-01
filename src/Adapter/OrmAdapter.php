@@ -261,7 +261,7 @@ class OrmAdapter implements AdapterInterface
 
         // TODO: Extract this code in a repository instead of enhancer
         $this->contentRouteEnhancer->resolveRouteContent($route);
-        
+
         return $route;
     }
 
@@ -303,7 +303,7 @@ class OrmAdapter implements AdapterInterface
     public function compareAutoRouteLocale(AutoRouteInterface $autoRoute, $locale)
     {
         $autoRouteLocale = $autoRoute->getLocale();
-        if ($autoRouteLocale === self::TAG_NO_MULTILANG) {
+        if (self::TAG_NO_MULTILANG === $autoRouteLocale) {
             $autoRouteLocale = null;
         }
 

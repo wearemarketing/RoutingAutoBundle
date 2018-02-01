@@ -120,10 +120,12 @@ class PhpcrOdmAdapter implements AdapterInterface
         $document = $parentDocument = $this->dm->find(null, $basePath);
 
         if (null === $parentDocument) {
-            throw new \RuntimeException(sprintf('The "route_basepath" configuration points to a non-existant path "%s".',
+            throw new \RuntimeException(sprintf(
+                'The "route_basepath" configuration points to a non-existant path "%s".',
                 $basePath
             ));
         }
+
         $segments = preg_split('#/#', $uriContext->getUri(), null, PREG_SPLIT_NO_EMPTY);
         $headName = array_pop($segments);
         foreach ($segments as $segment) {
@@ -136,6 +138,7 @@ class PhpcrOdmAdapter implements AdapterInterface
                 $document->setNodeName($segment);
                 $this->dm->persist($document);
             }
+
             $parentDocument = $document;
         }
 

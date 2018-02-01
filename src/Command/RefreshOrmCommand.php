@@ -32,10 +32,16 @@ relies on the auto routing of another class.
 HERE
         );
 
-        $this->addOption('dry-run', null, InputOption::VALUE_NONE,
+        $this->addOption(
+            'dry-run',
+            null,
+            InputOption::VALUE_NONE,
             'Do not write any change to the database.'
         );
-        $this->addOption('class', null, InputOption::VALUE_REQUIRED,
+        $this->addOption(
+            'class',
+            null,
+            InputOption::VALUE_REQUIRED,
             'Only update the given class FQN'
         );
     }
@@ -80,6 +86,7 @@ HERE
 
                     $entities[] = $m->getName();
                 }
+
                 foreach ($entities as $entityFqn) {
                     $currentEntity = new \ReflectionClass($entityFqn);
 

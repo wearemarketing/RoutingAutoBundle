@@ -59,6 +59,6 @@ class AppKernel extends TestKernel
      */
     private function isOrmEnv()
     {
-        return $this->environment === 'doctrine_orm' or $this->environment === 'orm';
+        return 'doctrine_orm' === $this->environment or 'orm' === $this->environment;
     }
 }

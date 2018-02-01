@@ -86,7 +86,7 @@ class DoctrineOrm implements RepositoryInterface
             ->getRepository(AutoRoute::class);
 
         return $repository->findOneBy([
-            'staticPrefix' => $url
+            'staticPrefix' => $url,
         ]);
     }
 
@@ -114,7 +114,7 @@ class DoctrineOrm implements RepositoryInterface
         $contentId = ['id' => $post->getId()];
 
         $routes = $repository->findBy([
-            'contentClass' => get_class($post)
+            'contentClass' => get_class($post),
         ]);
 
         $routesCollection = new ArrayCollection($routes);

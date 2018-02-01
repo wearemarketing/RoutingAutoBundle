@@ -9,7 +9,6 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Symfony\Cmf\Bundle\RoutingAutoBundle\Doctrine\Orm;
 
 use Doctrine\ORM\EntityManager;
@@ -59,9 +58,9 @@ class AutoRouteListener
 
     /**
      * Removes from the updates array the entities that aren't autoroutable
-     * Also, just in case of translations, puts into updates array the translatable entity if it wasn't yet
+     * Also, just in case of translations, puts into updates array the translatable entity if it wasn't yet.
      *
-     * @param array $inEntities
+     * @param  array $inEntities
      * @return array
      */
     private function parseUpdateEntities(array $inEntities)
@@ -70,8 +69,6 @@ class AutoRouteListener
         foreach ($inEntities as $entity) {
             if ($this->isAutoRouteable($entity)) {
                 $outEntities[] = $entity;
-
-                continue;
             }
 
             if ($this->isATranslationOfAnEntityAutoRoutable($inEntities, $entity)) {
@@ -84,7 +81,7 @@ class AutoRouteListener
     }
 
     /**
-     * Checks autoroutable entities based on configuration
+     * Checks autoroutable entities based on configuration.
      *
      * @param $document
      * @return bool
@@ -92,7 +89,7 @@ class AutoRouteListener
     private function isAutoRouteable($document)
     {
         try {
-            return (boolean)$this->getMetadataFactory()->getMetadataForClass(get_class($document));
+            return (bool) $this->getMetadataFactory()->getMetadataForClass(get_class($document));
         } catch (ClassNotMappedException $e) {
             return false;
         }
@@ -109,7 +106,7 @@ class AutoRouteListener
     }
 
     /**
-     * Here is almost all the magic, new routes are guessed, created and persisted
+     * Here is almost all the magic, new routes are guessed, created and persisted.
      *
      * @param OnFlushEventArgs $eventArgs
      */
@@ -175,7 +172,7 @@ class AutoRouteListener
     }
 
     /**
-     * After persist the entity, its id can (and shall) be retrieved and setted on the route
+     * After persist the entity, its id can (and shall) be retrieved and setted on the route.
      *
      * @param LifecycleEventArgs $eventArgs
      */
@@ -199,11 +196,11 @@ class AutoRouteListener
     }
 
     /**
-     * Tries to replace in route name or canonicalName the id placeholder by the real row id
+     * Tries to replace in route name or canonicalName the id placeholder by the real row id.
      *
      * @param AutoRouteInterface $autoRoute
-     * @param array $id
-     * @param string $nameField
+     * @param array              $id
+     * @param string             $nameField
      */
     private function replaceIdOnNameField(AutoRouteInterface $autoRoute, array $id, $nameField)
     {
@@ -223,7 +220,7 @@ class AutoRouteListener
     /**
      * @param array $inEntities
      * @param $entity
-     * @return boolean
+     * @return bool
      *
      * @throws \ReflectionException
      */

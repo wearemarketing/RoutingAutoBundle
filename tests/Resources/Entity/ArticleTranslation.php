@@ -14,7 +14,6 @@ namespace Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Knp\DoctrineBehaviors\Model as ORMBehaviors;
 
-
 /**
  * @ORM\Entity()
  */

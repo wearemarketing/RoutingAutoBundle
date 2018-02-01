@@ -49,6 +49,7 @@ class CmfRoutingAutoExtension extends Extension
                 $resources[] = $resource;
             }
         }
+
         $container->setParameter('cmf_routing_auto.metadata.loader.resources', $resources);
 
         $hasProvider = false;
@@ -64,8 +65,9 @@ class CmfRoutingAutoExtension extends Extension
             if (null === $adapterName) {
                 $adapterName = 'doctrine_phpcr_odm';
             }
+
             $container->setParameter('cmf_routing_auto.persistence.phpcr.route_basepath', $config['persistence']['phpcr']['route_basepath']);
-        } else if ($this->isConfigEnabled($container, $config['persistence']['orm'])) {
+        } elseif ($this->isConfigEnabled($container, $config['persistence']['orm'])) {
             $hasProvider = true;
             $loader->load('orm.xml');
             if (null === $adapterName) {

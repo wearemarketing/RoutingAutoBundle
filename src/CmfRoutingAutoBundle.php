@@ -72,7 +72,7 @@ class CmfRoutingAutoBundle extends Bundle
         $container->addCompilerPass(
             DoctrineOrmMappingsPass::createXmlMappingDriver(
                 array(
-                    realpath(__DIR__ . '/Resources/config/doctrine-model') => 'Symfony\Cmf\Bundle\RoutingAutoBundle\Model',
+                    realpath(__DIR__.'/Resources/config/doctrine-model') => 'Symfony\Cmf\Bundle\RoutingAutoBundle\Model',
                 ),
                 array('cmf_routing_auto.dynamic.persistence.orm.manager_name'),
                 false,

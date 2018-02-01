@@ -60,12 +60,12 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
         $blog = $repository->findBlog('Unit testing blog');
         $routes = $blog->getRoutes();
 
-        $this->assertCount(1, $routes, "There is no route associted with Entity");
+        $this->assertCount(1, $routes, 'There is no route associted with Entity');
         /** @var AutoRoute $route */
         $route = $routes[0];
         $this->assertInstanceOf(AutoRoute::class, $route);
         $locale = 'en';
-        $this->assertContains('Blog_'.$blog->getId(). '_' . $locale . '_', $route->getName());
+        $this->assertContains('Blog_'.$blog->getId().'_'.$locale.'_', $route->getName());
         $this->assertEquals('Blog_'.$blog->getId(), $route->getCanonicalName());
         $this->assertEquals($locale, $route->getAutoRouteTag());
         $this->assertEquals('cmf_routing_auto.primary', $route->getType());
@@ -117,7 +117,7 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
         $newRoute = $routes[1];
         $this->assertEquals('Blog_'.$blog->getId(), $newRoute->getCanonicalName());
         $this->assertInstanceOf(AutoRoute::class, $newRoute);
-        $this->assertContains('Blog_'.$blog->getId(). '_en_', $newRoute->getName());
+        $this->assertContains('Blog_'.$blog->getId().'_en_', $newRoute->getName());
         $this->assertEquals('/blog/foobar', $newRoute->getStaticPrefix());
 
         // How to have to be the old route
@@ -125,7 +125,7 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
         $oldRoute = $routes[0];
         $this->assertEquals('Blog_'.$blog->getId(), $oldRoute->getCanonicalName());
         $this->assertInstanceOf(AutoRoute::class, $oldRoute);
-        $this->assertContains('Blog_'.$blog->getId(). '_en_', $oldRoute->getName());
+        $this->assertContains('Blog_'.$blog->getId().'_en_', $oldRoute->getName());
         $this->assertEquals('/blog/unit-testing-blog', $oldRoute->getStaticPrefix());
         $this->assertEquals('en', $oldRoute->getAutoRouteTag());
         $this->assertEquals('cmf_routing_auto.redirect', $oldRoute->getType());
@@ -386,7 +386,7 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
      */
     public function testUpdateMultilangArticle($data, $expectedPaths)
     {
-        $this->markTestSkipped("Working...");
+        $this->markTestSkipped('Working...');
         $article = new Article();
         $article->path = '/test/article-1';
         $this->getDm()->persist($article);
@@ -431,7 +431,7 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
 
     public function testResolveConflictOnSingleMultilangArticle()
     {
-        $this->markTestSkipped("Working...");
+        $this->markTestSkipped('Working...');
         $article = new ConflictProneArticle();
         $article->path = '/test/article';
         $article->title = 'Weekend';
@@ -487,7 +487,7 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
      */
     public function testLeaveRedirect($data, $updatedData, $expectedRedirectRoutePaths, $expectedAutoRoutePaths)
     {
-        $this->markTestSkipped("Working...");
+        $this->markTestSkipped('Working...');
         $article = new SeoArticleMultilang();
         $article->title = 'Hai';
         $article->path = '/test/article-1';
@@ -529,7 +529,7 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
      */
     public function testLeaveRedirectAndRenameToOriginal()
     {
-        $this->markTestSkipped("Working...");
+        $this->markTestSkipped('Working...');
         $article = new SeoArticle();
         $article->title = 'Hai';
         $article->path = '/test/article-1';
@@ -550,7 +550,7 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
      */
     public function testLeaveRedirectChildrenMigrations()
     {
-        $this->markTestSkipped("It is tested in the testUpdateRenameBlog. At the moment we do not propagate the changes to children");
+        $this->markTestSkipped('It is tested in the testUpdateRenameBlog. At the moment we do not propagate the changes to children');
     }
 
     /**
@@ -582,7 +582,7 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
 
     public function testConflictResolverAutoIncrement()
     {
-        $this->markTestSkipped("Working...");
+        $this->markTestSkipped('Working...');
         $this->createBlog();
         $blog = $this->getDm()->find(null, '/test/test-blog');
 
@@ -624,7 +624,7 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
 
     public function testCreationOfChildOnRoot()
     {
-        $this->markTestSkipped("Working...");
+        $this->markTestSkipped('Working...');
         $page = new Page();
         $page->title = 'Home';
         $page->path = '/test/home';
@@ -642,7 +642,7 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
      */
     public function testConflictResolverDefaultThrowException()
     {
-        $this->markTestSkipped("Working...");
+        $this->markTestSkipped('Working...');
         $blog = new Blog();
         $blog->path = '/test/test-blog';
         $blog->title = 'Unit testing blog';
@@ -658,7 +658,7 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
 
     public function testGenericNodeShouldBeConvertedInAnAutoRouteNode()
     {
-        $this->markTestSkipped("Working...");
+        $this->markTestSkipped('Working...');
         $blog = new Blog();
         $blog->path = '/test/my-post';
         $blog->title = 'My Post';
