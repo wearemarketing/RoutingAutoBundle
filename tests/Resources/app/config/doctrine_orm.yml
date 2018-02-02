@@ -10,6 +10,7 @@ cmf_routing:
         persistence:
             orm:
                 enabled: true
+                route_class: Symfony\Cmf\Bundle\RoutingAutoBundle\Entity\AutoRoute
 
 cmf_routing_auto:
     auto_mapping: false
