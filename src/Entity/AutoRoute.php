@@ -11,7 +11,7 @@ use Symfony\Cmf\Component\RoutingAuto\Model\AutoRouteInterface;
  * TODO: if we create one table, which name for all routes and auto routes
  * TODO: Add all index as in Orm\Route
  *
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Symfony\Cmf\Bundle\RoutingAutoBundle\Repository\AutoRouteRepository")
  * @ORM\Table(name="orm_auto_routes")
  */
 class AutoRoute extends Route implements AutoRouteInterface

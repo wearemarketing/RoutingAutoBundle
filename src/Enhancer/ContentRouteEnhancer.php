@@ -18,13 +18,13 @@ use Symfony\Cmf\Component\Routing\Enhancer\RouteEnhancerInterface;
 class ContentRouteEnhancer implements RouteEnhancerInterface
 {
     /**
-     * @var EntityManagerInterface
+     * @var \Doctrine\Common\Persistence\ObjectRepository|\Symfony\Cmf\Bundle\RoutingAutoBundle\Repository\AutoRouteRepository
      */
-    private $manager;
+    private $repository;
 
     public function __construct(EntityManagerInterface $manager)
     {
-        $this->manager = $manager;
+        $this->repository = $manager->getRepository(AutoRoute::class);
     }
 
     /**
@@ -38,35 +38,9 @@ class ContentRouteEnhancer implements RouteEnhancerInterface
         $routeObject = $defaults[RouteObjectInterface::ROUTE_OBJECT];
 
         if ($routeObject instanceof AutoRoute) {
-            $this->resolveRouteContent($routeObject);
+            $this->repository->resolveRouteContent($routeObject);
         }
 
         return $defaults;
-    }
-
-    /**
-     * Resolves the route content.
-     *
-     * TODO: Add type hinting. Extract methods in a model class or create interface
-     *
-     * @param Route $routeObject
-     */
-    public function resolveRouteContent($routeObject)
-    {
-        // TODO: Extract this code in a repository instead of enhancer
-
-        $class = $routeObject->getContentClass();
-        $id = $routeObject->getContentId();
-        if (empty($class) or empty($id)) {
-            return;
-        }
-
-        $objectRepository = $this->manager->getRepository($class);
-        $object = $objectRepository->find($id);
-        if ($object instanceof TranslatableInterface) {
-            $object->setCurrentLocale($routeObject->getDefault('_locale'));
-        }
-
-        $routeObject->setContent($object);
     }
 }

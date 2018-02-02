@@ -17,7 +17,6 @@
         <!-- Adapters -->
         <service id="cmf_routing_auto.adapter.orm" class="Symfony\Cmf\Bundle\RoutingAutoBundle\Adapter\OrmAdapter">
             <argument type="service" id="doctrine.orm.entity_manager"/>
-            <argument type="service" id="cmf_routing_auto.enhancer.orm.content_router"/>
             <argument>%cmf_routing_auto.auto_route_entity.class%</argument>
             <tag name="cmf_routing_auto.adapter" alias="doctrine_orm" />
         </service>

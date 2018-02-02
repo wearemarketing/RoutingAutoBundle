@@ -18,6 +18,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Symfony\Cmf\Bundle\CoreBundle\Translatable\TranslatableInterface;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Enhancer\ContentRouteEnhancer;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Entity\AutoRoute;
+use Symfony\Cmf\Bundle\RoutingAutoBundle\Repository\AutoRouteRepository;
 use Symfony\Cmf\Component\RoutingAuto\AdapterInterface;
 use Symfony\Cmf\Component\RoutingAuto\Model\AutoRouteInterface;
 use Symfony\Cmf\Component\RoutingAuto\UriContext;
@@ -46,24 +47,17 @@ class OrmAdapter implements AdapterInterface
     private $autoRouteFqcn;
 
     /**
-     * @var ContentRouteEnhancer
-     */
-    private $contentRouteEnhancer;
-
-    /**
-     * @var ObjectRepository
+     * @var ObjectRepository|AutoRouteRepository
      */
     private $repository;
 
     /**
      * @param EntityManagerInterface $em
-     * @param ContentRouteEnhancer   $contentRouteEnhancer
      * @param string                 $autoRouteFqcn        The FQCN of the AutoRoute document to use
      */
-    public function __construct(EntityManagerInterface $em, ContentRouteEnhancer $contentRouteEnhancer, $autoRouteFqcn)
+    public function __construct(EntityManagerInterface $em, $autoRouteFqcn)
     {
         $this->em = $em;
-        $this->contentRouteEnhancer = $contentRouteEnhancer;
 
         $reflection = new \ReflectionClass($autoRouteFqcn);
         if (!$reflection->isSubclassOf('Symfony\Cmf\Component\RoutingAuto\Model\AutoRouteInterface')) {
@@ -80,7 +74,7 @@ class OrmAdapter implements AdapterInterface
      */
     public function getLocales($contentDocument)
     {
-        //todo look for better approach
+        // TODO: look for better approach. This is because we are using knp doctrine behaviour lib
         if ($contentDocument instanceof TranslatableInterface) {
             return array_keys($contentDocument->getTranslations()->toArray());
         }
@@ -259,8 +253,7 @@ class OrmAdapter implements AdapterInterface
             return null;
         }
 
-        // TODO: Extract this code in a repository instead of enhancer
-        $this->contentRouteEnhancer->resolveRouteContent($route);
+        $this->repository->resolveRouteContent($route);
 
         return $route;
     }
