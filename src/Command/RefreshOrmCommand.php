@@ -2,7 +2,10 @@
 
 namespace Symfony\Cmf\Bundle\RoutingAutoBundle\Command;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Cmf\Component\RoutingAuto\AutoRouteManager;
+use Symfony\Cmf\Component\RoutingAuto\Mapping\MetadataFactory;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -10,6 +13,21 @@ use Symfony\Cmf\Component\RoutingAuto\UriContextCollection;
 
 class RefreshOrmCommand extends ContainerAwareCommand
 {
+    /**
+     * @var MetadataFactory
+     */
+    private $metadataFactory;
+
+    /**
+     * @var AutoRouteManager
+     */
+    private $autoRouteManager;
+
+    /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+
     public function configure()
     {
         $this
@@ -46,21 +64,21 @@ HERE
         );
     }
 
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        parent::initialize($input, $output);
+
+        $container = $this->getContainer();
+        $this->entityManager = $container->get('doctrine')->getManager();
+        $this->metadataFactory = $container->get('cmf_routing_auto.metadata.factory');
+        $this->autoRouteManager = $container->get('cmf_routing_auto.auto_route_manager');
+    }
+
     /**
-     * todo: esto es una basura. apañarlo sobre el proyecto esmeralda 2 donde está toda la casuística.
-     *
      * {@inheritdoc}
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $container = $this->getContainer();
-        $manager = $container->get('doctrine');
-        $factory = $container->get('cmf_routing_auto.metadata.factory');
-        $arm = $container->get('cmf_routing_auto.auto_route_manager');
-
-        $em = $manager->getManager();
-        $uow = $em->getUnitOfWork();
-
         $dryRun = $input->getOption('dry-run');
         $class = $input->getOption('class');
         $verbose = $input->getOption('verbose');
@@ -70,32 +88,16 @@ HERE
         if ($class) {
             $mapping = array($class => $class);
         } else {
-            $mapping = iterator_to_array($factory->getIterator());
+            $mapping = iterator_to_array($this->metadataFactory->getIterator());
         }
 
         $array_keys = array_keys($mapping);
         foreach ($array_keys as $classFqn) {
             $currentClass = new \ReflectionClass($classFqn);
             if ($currentClass->isAbstract()) {
-                $em = $manager->getManager();
-                $meta = $em->getMetadataFactory()->getAllMetadata();
-                foreach ($meta as $m) {
-                    if (0 === strcmp($m->getName(), $classFqn)) {
-                        continue;
-                    }
-
-                    $entities[] = $m->getName();
-                }
-
-                foreach ($entities as $entityFqn) {
-                    $currentEntity = new \ReflectionClass($entityFqn);
-
-                    if ($this->isParentClass($currentEntity, $currentClass) && !$currentEntity->isAbstract()) {
-                        $this->processRoutes($output, $entityFqn, $em, $uow, $arm, $verbose, $dryRun);
-                    }
-                }
+                $this->processRoutesForAnAbstractAutoRouteClass($output, $classFqn, $entities, $currentClass, $verbose, $dryRun);
             } else {
-                $this->processRoutes($output, $classFqn, $em, $uow, $arm, $verbose, $dryRun);
+                $this->processRoutes($output, $classFqn, $verbose, $dryRun);
             }
         }
     }
@@ -122,33 +124,32 @@ HERE
     /**
      * @param OutputInterface $output
      * @param $classFqn
-     * @param $em
-     * @param $uow
-     * @param $arm
      * @param $verbose
      * @param $dryRun
      */
-    protected function processRoutes(OutputInterface $output, $classFqn, $em, $uow, $arm, $verbose, $dryRun)
+    protected function processRoutes(OutputInterface $output, $classFqn, $verbose, $dryRun)
     {
         $output->writeln(sprintf('<info>Processing class: </info> %s', $classFqn));
 
-        $qb = $em->createQueryBuilder();
+        $unitOfWork = $this->entityManager->getUnitOfWork();
+
+        $qb = $this->entityManager->createQueryBuilder();
         $qb->select('a')
             ->from($classFqn, 'a');
         $q = $qb->getQuery();
         $result = $q->getResult();
 
         foreach ($result as $autoRouteableEntity) {
-            $id = $uow->getSingleIdentifierValue($autoRouteableEntity);
+            $id = $unitOfWork->getSingleIdentifierValue($autoRouteableEntity);
             $output->writeln('  <info>Refreshing: </info>'.$id);
 
             $uriContextCollection = new UriContextCollection($autoRouteableEntity);
-            $arm->buildUriContextCollection($uriContextCollection);
+            $this->autoRouteManager->buildUriContextCollection($uriContextCollection);
 
             foreach ($uriContextCollection->getUriContexts() as $uriContext) {
                 $autoRoute = $uriContext->getAutoRoute();
-                $em->persist($autoRoute);
-                $autoRouteId = $uow->getSingleIdentifierValue($autoRoute);
+                $this->entityManager->persist($autoRoute);
+                $autoRouteId = $unitOfWork->getSingleIdentifierValue($autoRoute);
                 if ($verbose) {
                     $output->writeln(
                         sprintf(
@@ -161,8 +162,37 @@ HERE
                 }
 
                 if (true !== $dryRun) {
-                    $em->flush();
+                    $this->entityManager->flush();
                 }
+            }
+        }
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @param $classFqn
+     * @param $entities
+     * @param $currentClass
+     * @param $verbose
+     * @param $dryRun
+     * @throws \ReflectionException
+     */
+    private function processRoutesForAnAbstractAutoRouteClass(OutputInterface $output, $classFqn, $entities, $currentClass, $verbose, $dryRun)
+    {
+        $meta = $this->entityManager->getMetadataFactory()->getAllMetadata();
+        foreach ($meta as $m) {
+            if (0 === strcmp($m->getName(), $classFqn)) {
+                continue;
+            }
+
+            $entities[] = $m->getName();
+        }
+
+        foreach ($entities as $entityFqn) {
+            $currentEntity = new \ReflectionClass($entityFqn);
+
+            if ($this->isParentClass($currentEntity, $currentClass) && !$currentEntity->isAbstract()) {
+                $this->processRoutes($output, $entityFqn, $verbose, $dryRun);
             }
         }
     }
