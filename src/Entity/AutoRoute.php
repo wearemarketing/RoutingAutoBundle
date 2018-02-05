@@ -5,6 +5,7 @@ namespace Symfony\Cmf\Bundle\RoutingAutoBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Cmf\Bundle\RoutingBundle\Model\Route;
 use Symfony\Cmf\Component\RoutingAuto\Model\AutoRouteInterface;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\ref;
 
 /**
  * TODO: create 2 tables or only one
@@ -66,16 +67,6 @@ class AutoRoute extends Route implements AutoRouteInterface
     private $contentId;
 
     /**
-     *
-     * TODO: Add this field as default param
-     *
-     * @ORM\Column(type="string", length=30)
-     *
-     * @var string
-     */
-    protected $type;
-
-    /**
      * TODO: Add this field as default param
      *
      * @ORM\Column(type="string", length=12, nullable=true)
@@ -88,7 +79,7 @@ class AutoRoute extends Route implements AutoRouteInterface
     {
         parent::__construct($options);
 
-        $this->type = AutoRouteInterface::TYPE_PRIMARY;
+        $this->setType(AutoRouteInterface::TYPE_PRIMARY);
     }
 
     /**
@@ -286,9 +277,7 @@ class AutoRoute extends Route implements AutoRouteInterface
      */
     public function setType($mode)
     {
-        $this->type = $mode;
-
-        return $this;
+        $this->setDefault('type', $mode);
     }
 
     /**
@@ -296,7 +285,7 @@ class AutoRoute extends Route implements AutoRouteInterface
      */
     public function getType()
     {
-        return $this->type;
+        return $this->getDefault('type');
     }
 
     /**
