@@ -248,6 +248,33 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
         }
     }
 
+    public function testUpdatePostNoTranslatableNotChangingTitle()
+    {
+        /** @var DoctrineOrm $repository */
+        $repository = $this->getRepository();
+        $repository->createBlogNoTranslatable(true);
+
+        /** @var Post $post */
+        $post = $repository->findPostNoTranslatable('This is a post title');
+        $this->assertNotNull($post);
+
+        $post->setBody('Test');
+
+        $this->getObjectManager()->persist($post);
+        $this->getObjectManager()->flush();
+        $this->getObjectManager()->clear();
+
+        $post = $repository->findPostNoTranslatable('This is a post title');
+        $routes = $post->getRoutes();
+
+        $this->assertCount(1, $routes);
+        /** @var AutoRoute $route */
+        $route = $routes[0];
+        $this->assertInstanceOf(AutoRoute::class, $route);
+
+        $this->assertEquals('/blog/unit-testing-blog/2013/03/21/this-is-a-post-title', $route->getStaticPrefix());
+    }
+
     public function testUpdatePostNotChangingTitle()
     {
         /** @var DoctrineOrm $repository */
@@ -295,6 +322,26 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
         // because we do not propagate the changes to children
     }
 
+    public function testRemoveBlogNoTranslatable()
+    {
+        /** @var DoctrineOrm $repository */
+        $repository = $this->getRepository();
+        $repository->createBlogNoTranslatable();
+
+        $blog = $repository->findBlogNoTranslatable('Unit testing blog');
+
+        // test removing
+        $this->getObjectManager()->remove($blog);
+
+        $this->getObjectManager()->flush();
+
+        $routes = $repository->findRoutesForBlog($blog);
+        $this->assertEmpty($routes);
+
+        // We should test when the blog has post. But it will be the same for ass
+        // because we do not propagate the changes to children
+    }
+
     public function testPersistPost()
     {
         /** @var DoctrineOrm $repository */
@@ -316,6 +363,29 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
         $this->assertEquals(['id' => $post->getId()], $route->getContentId());
         $this->assertInstanceOf(AutoRoute::class, $route);
         $this->assertContains('Post_'.$post->getId().'_en_', $route->getName());
+    }
+
+    public function testPersistPostNoTranslatable()
+    {
+        /** @var DoctrineOrm $repository */
+        $repository = $this->getRepository();
+        $repository->createBlogNoTranslatable(true);
+
+        $route = $repository->findAutoRoute('/blog/unit-testing-blog/2013/03/21/this-is-a-post-title');
+        $this->assertNotNull($route);
+
+        // make sure auto-route references content
+        /** @var Post $post */
+        $post = $repository->findPostNoTranslatable('This is a post title');
+        $routes = $post->getRoutes();
+        $this->assertCount(1, $routes);
+        /** @var AutoRoute $route */
+        $route = $routes[0];
+
+        $this->assertSame(get_class($post), $route->getContentClass());
+        $this->assertEquals(['id' => $post->getId()], $route->getContentId());
+        $this->assertInstanceOf(AutoRoute::class, $route);
+        $this->assertContains('PostNoTranslatable_'.$post->getId().'_', $route->getName());
     }
 
     public function testUpdatePost()
@@ -344,6 +414,34 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
 
         $this->assertInstanceOf(AutoRoute::class, $route);
         $this->assertContains('Post_'.$post->getId().'_en_', $route->getName());
+
+        $this->assertEquals('/blog/unit-testing-blog/2014/01/25/this-is-different', $route->getStaticPrefix());
+    }
+
+    public function testUpdatePostNoTranslatable()
+    {
+        /** @var DoctrineOrm $repository */
+        $repository = $this->getRepository();
+        $repository->createBlogNoTranslatable(true);
+
+        // make sure auto-route references content
+        /** @var Post $post */
+        $post = $repository->findPostNoTranslatable('This is a post title');
+        $post->setTitle('This is different');
+
+        $post->setDate(new \DateTime('2014-01-25'));
+
+        $this->getObjectManager()->persist($post);
+        $this->getObjectManager()->flush();
+
+        $routes = $repository->findRoutesForPostNoTranslatable($post);
+
+        $this->assertCount(1, $routes);
+        /** @var AutoRoute $route */
+        $route = $routes[0];
+
+        $this->assertInstanceOf(AutoRoute::class, $route);
+        $this->assertContains('PostNoTranslatable_'.$post->getId().'_', $route->getName());
 
         $this->assertEquals('/blog/unit-testing-blog/2014/01/25/this-is-different', $route->getStaticPrefix());
     }

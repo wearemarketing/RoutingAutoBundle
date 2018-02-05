@@ -174,6 +174,30 @@ class DoctrineOrm implements RepositoryInterface
         return $routes->toArray();
     }
 
+    public function findRoutesForPostNoTranslatable(PostNoTranslatable $post)
+    {
+        $repository = $this
+            ->getObjectManager()
+            ->getRepository(AutoRoute::class);
+
+        $contentId = ['id' => $post->getId()];
+
+        $routes = $repository->findBy([
+            'contentClass' => get_class($post),
+        ]);
+
+        $routesCollection = new ArrayCollection($routes);
+        $routes = $routesCollection->filter(function ($route) use ($contentId) {
+            if ($route->getContentId() === $contentId) {
+                return true;
+            }
+
+            return false;
+        });
+
+        return $routes->toArray();
+    }
+
     public function findContent(AutoRoute $route)
     {
         $repository = $this->getObjectManager()->getRepository($route->getContentClass());
