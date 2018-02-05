@@ -45,6 +45,42 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
      * It should persist the blog document and create an auto route.
      * It should set the defaults on the route.
      */
+    public function testPersistBlogNoTranslatable()
+    {
+        /** @var DoctrineOrm $repository */
+        $repository = $this->getRepository();
+        $repository->createBlogNoTranslatable();
+
+        $autoRoute = $repository->findAutoRoute('/blog/unit-testing-blog');
+
+        $this->assertNotEmpty($autoRoute);
+
+        /** @var \Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\BlogNoTranslatable $blog */
+        // make sure auto-route has been persisted
+        $blog = $repository->findBlogNoTranslatable('Unit testing blog');
+        $routes = $blog->getRoutes();
+
+        $this->assertCount(1, $routes, 'There is no route associted with Entity');
+        /** @var AutoRoute $route */
+        $route = $routes[0];
+        $this->assertInstanceOf(AutoRoute::class, $route);
+        $locale = 'no-multilang';
+        $this->assertContains('BlogNoTranslatable_'.$blog->getId().'_', $route->getName());
+        $this->assertEquals('BlogNoTranslatable_'.$blog->getId(), $route->getCanonicalName());
+        $this->assertEquals($locale, $route->getAutoRouteTag());
+        $this->assertEquals('cmf_routing_auto.primary', $route->getType());
+        $this->assertEquals(
+            [
+                '_controller' => 'BlogController',
+            ],
+            $route->getDefaults()
+        );
+    }
+
+    /**
+     * It should persist the blog document and create an auto route.
+     * It should set the defaults on the route.
+     */
     public function testPersistBlog()
     {
         /** @var DoctrineOrm $repository */

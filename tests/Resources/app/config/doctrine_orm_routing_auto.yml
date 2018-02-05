@@ -1,3 +1,14 @@
+Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\BlogNoTranslatable:
+    definitions:
+        frontend:
+            uri_schema: /blog/{blog_title}
+            defaults:
+                _controller: BlogController
+    token_providers:
+        blog_title: [content_method, { method: getTitle } ]
+#    conflict_resolver: auto_increment
+#    defunct_route_handler: leave_redirect
+
 Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Blog:
     definitions:
         frontend:

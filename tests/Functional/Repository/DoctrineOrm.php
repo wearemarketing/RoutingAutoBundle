@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\NoResultException;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Functional\RepositoryInterface;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Blog;
+use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\BlogNoTranslatable;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Post;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Entity\AutoRoute;
@@ -21,6 +22,17 @@ class DoctrineOrm implements RepositoryInterface
 
     public function init()
     {
+    }
+
+    public function createBlogNoTranslatable()
+    {
+        $blog = new BlogNoTranslatable();
+        $blog->setTitle('Unit testing blog');
+
+        $this->getObjectManager()->persist($blog);
+
+        $this->getObjectManager()->flush();
+        $this->getObjectManager()->clear();
     }
 
     public function createBlog($withPosts = false)
@@ -47,6 +59,17 @@ class DoctrineOrm implements RepositoryInterface
     public function getObjectManager()
     {
         return $this->container->get('doctrine')->getManager();
+    }
+
+    public function findBlogNoTranslatable($blogName)
+    {
+        $objectManager = $this->getObjectManager();
+
+        $blog = $objectManager
+            ->getRepository(BlogNoTranslatable::class)
+            ->findOneByTitle($blogName);
+
+        return $blog;
     }
 
     public function findBlog($blogName)
