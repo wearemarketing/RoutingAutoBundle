@@ -534,10 +534,10 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
                     'es' => 'Hola todo el mundo',
                 ],
                 [
-                    'test/auto-route/articles/en-gb/hello-everybody',
-                    'test/auto-route/articles/fr-fr/bonjour-le-monde',
-                    'test/auto-route/articles/de-de/gutentag-und-auf-wiedersehen',
-                    'test/auto-route/articles/hola-todo-el-mundo',
+                    '/articles/en/hello-everybody',
+                    '/articles/fr/bonjour-le-monde',
+                    '/articles/de/gutentag-und-auf-wiedersehen',
+                    '/articles/es/hola-todo-el-mundo',
                 ],
             ],
         ];
@@ -548,46 +548,57 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
      */
     public function testUpdateMultilangArticle($data, $expectedPaths)
     {
-        $this->markTestSkipped('Working...');
         $article = new Article();
-        $article->path = '/test/article-1';
-        $this->getDm()->persist($article);
+        $article->setTitle('Article 1');
+        $this->getObjectManager()->persist($article);
 
         foreach ($data as $lang => $title) {
-            $article->title = $title;
-            $this->getDm()->bindTranslation($article, $lang);
+            $article->setLocale($lang);
+            $article->setTitle($title);
         }
 
-        $this->getDm()->flush();
+        $article->mergeNewTranslations();
 
-        $article_de = $this->getDm()->findTranslation('Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Document\Article', '/test/article-1', 'de');
-        $article_de->title .= '-und-auf-wiedersehen';
-        $this->getDm()->bindTranslation($article_de, 'de');
-        $this->getDm()->persist($article_de);
+        $this->getObjectManager()->persist($article);
+        $this->getObjectManager()->flush();
+        $this->getObjectManager()->clear();
 
-        $this->getDm()->flush();
+        $title = 'Gutentag';
+        $locale = 'de';
+        /** @var DoctrineOrm $repository */
+        $repository = $this->getRepository();
+        /** @var Article $article */
+        $article = $repository->findArticle($title, $locale);
+        $article->setLocale($locale);
+        $germanTitle = $article->getTitle() . '-und-auf-wiedersehen';
+        $article->setTitle($germanTitle);
+        $article->mergeNewTranslations();
+        $this->getObjectManager()->persist($article);
 
-        $article_de = $this->getDm()->findTranslation('Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Document\Article', '/test/article-1', 'de');
-        $routes = $this->getDm()->getReferrers($article_de);
+        $this->getObjectManager()->flush();
+
+        $article = $repository->findArticle($germanTitle, $locale);
+        $routes = $repository->findRoutesForArticle($article);
 
         // Multiply the expected paths by 3 because Article has 3 routes defined.
         $this->assertCount(count($data) * 3, $routes);
 
-        $this->getDm()->clear();
+        $this->getObjectManager()->clear();
 
         foreach ($expectedPaths as $expectedPath) {
-            $route = $this->getDm()->find(null, $expectedPath);
+            /** @var AutoRoute $route */
+            $route = $repository->findAutoRoute($expectedPath);
 
             $this->assertNotNull($route);
-            $this->assertInstanceOf('Symfony\Cmf\Bundle\RoutingAutoBundle\Model\AutoRoute', $route);
+            $this->assertInstanceOf(AutoRoute::class, $route);
 
-            $content = $route->getContent();
+            $content = $repository->findContent($route);
 
             $this->assertNotNull($content);
-            $this->assertInstanceOf('Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Document\Article', $content);
+            $this->assertInstanceOf(Article::class, $content);
 
-            // We havn't loaded the translation for the document, so it is always in the default language
-            $this->assertEquals('Hello everybody!', $content->title);
+            // We haven't loaded the translation for the document, so it is always in the default language
+            $this->assertEquals('Hello everybody!', $content->getTitle());
         }
     }
 

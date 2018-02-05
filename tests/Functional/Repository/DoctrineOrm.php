@@ -205,4 +205,45 @@ class DoctrineOrm implements RepositoryInterface
 
         return $object;
     }
+
+    public function findArticle($title, $locale)
+    {
+        $objectManager = $this->getObjectManager();
+        $query = $objectManager->createQuery("
+            SELECT a FROM Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Article a 
+            INNER JOIN Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\ArticleTranslation at
+            WHERE at.title = :title
+                AND at.locale = :locale
+        ");
+
+        $query->setParameter(':title', $title);
+        $query->setParameter(':locale', $locale);
+        $article = $query->getSingleResult();
+
+        return $article;
+    }
+
+    public function findRoutesForArticle($article)
+    {
+        $repository = $this
+            ->getObjectManager()
+            ->getRepository(AutoRoute::class);
+
+        $contentId = ['id' => $article->getId()];
+
+        $routes = $repository->findBy([
+            'contentClass' => get_class($article),
+        ]);
+
+        $routesCollection = new ArrayCollection($routes);
+        $routes = $routesCollection->filter(function ($route) use ($contentId) {
+            if ($route->getContentId() === $contentId) {
+                return true;
+            }
+
+            return false;
+        });
+
+        return $routes->toArray();
+    }
 }
