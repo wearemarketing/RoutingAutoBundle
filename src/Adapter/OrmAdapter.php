@@ -243,8 +243,6 @@ class OrmAdapter implements AdapterInterface
      */
     public function getReferringAutoRoutes($contentDocument)
     {
-        // TODO: Remove this method and we will remove the trait.
-        // The idea here is to create a query that get all route related to the content document
         return $contentDocument->getRoutes();
     }
 

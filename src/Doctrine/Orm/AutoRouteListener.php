@@ -157,8 +157,6 @@ class AutoRouteListener
         $removes = $unitOfWork->getScheduledEntityDeletions();
         foreach ($removes as $entity) {
             if ($this->isAutoRouteable($entity)) {
-                // TODO: We have to remove get route to remove multi route trait
-                // We have to create a query to get all route related to entity
                 foreach ($entity->getRoutes() as $route) {
                     $manager->remove($route);
                 }
