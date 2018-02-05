@@ -3,9 +3,7 @@
 namespace Symfony\Cmf\Bundle\RoutingAutoBundle\Enhancer;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Cmf\Bundle\CoreBundle\Translatable\TranslatableInterface;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Entity\AutoRoute;
-use Symfony\Cmf\Bundle\RoutingBundle\Model\Route;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Cmf\Component\Routing\Enhancer\RouteEnhancerInterface;
