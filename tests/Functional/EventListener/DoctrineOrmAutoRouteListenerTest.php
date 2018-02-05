@@ -732,7 +732,7 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
      */
     public function testLeaveRedirectChildrenMigrations()
     {
-        $this->markTestSkipped('It is tested in the testUpdateRenameBlog. At the moment we do not propagate the changes to children');
+        $this->markTestSkipped('At the moment we do not propagate the changes to children');
     }
 
     /**
