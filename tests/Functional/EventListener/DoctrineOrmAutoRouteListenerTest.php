@@ -836,35 +836,6 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
 
     public function testGenericNodeShouldBeConvertedInAnAutoRouteNode()
     {
-        $this->markTestSkipped('Working...');
-        $blog = new Blog();
-        $blog->path = '/test/my-post';
-        $blog->title = 'My Post';
-        $this->getDm()->persist($blog);
-        $this->getDm()->flush();
-
-        $this->assertInstanceOf(
-            'Doctrine\ODM\PHPCR\Document\Generic',
-            $this->getDm()->find(null, '/test/auto-route/blog')
-        );
-        $blogRoute = $this->getDm()->find(null, '/test/auto-route/blog/my-post');
-        $this->assertInstanceOf('Symfony\Cmf\Component\RoutingAuto\Model\AutoRouteInterface', $blogRoute);
-        $this->assertSame($blog, $blogRoute->getContent());
-
-        $page = new Page();
-        $page->path = '/test/blog';
-        $page->title = 'Blog';
-
-        $this->getDm()->persist($page);
-        $this->getDm()->flush();
-
-        $this->assertInstanceOf(
-            'Symfony\Cmf\Component\RoutingAuto\Model\AutoRouteInterface',
-            $this->getDm()->find(null, '/test/auto-route/blog')
-        );
-        $this->assertInstanceOf(
-            'Symfony\Cmf\Component\RoutingAuto\Model\AutoRouteInterface',
-            $this->getDm()->find(null, '/test/auto-route/blog/my-post')
-        );
+        $this->markTestSkipped("We don not have this feature in Doctrine ORM");
     }
 }
