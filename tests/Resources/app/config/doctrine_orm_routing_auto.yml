@@ -74,6 +74,14 @@ Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\ConflictProneArticle
         article_title: [content_method, { method: getTitle } ]
     conflict_resolver: [auto_increment]
 
+Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\SeoArticle:
+    definitions:
+        view:
+            uri_schema: /seo-articles/{article_title}
+    defunct_route_handler: [leave_redirect, {}]
+    token_providers:
+        article_title: [content_method, { method: getTitle } ]
+
 Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\SeoArticleMultilang:
     definitions:
         view:

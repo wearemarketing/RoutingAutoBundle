@@ -19,6 +19,7 @@ use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\ConcreteContent;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Blog;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\ConflictProneArticle;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Post;
+use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\SeoArticle;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\SeoArticleMultilang;
 use Symfony\Cmf\Component\RoutingAuto\Model\AutoRouteInterface;
 use Symfony\Cmf\Component\Testing\Functional\DbManager\ORM;
@@ -710,27 +711,20 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
         }
     }
 
-    /**
-     * @depends testLeaveRedirect
-     *
-     * See https://github.com/symfony-cmf/RoutingAutoBundle/issues/111
-     */
     public function testLeaveRedirectAndRenameToOriginal()
     {
-        $this->markTestSkipped('Working...');
         $article = new SeoArticle();
-        $article->title = 'Hai';
-        $article->path = '/test/article-1';
-        $this->getDm()->persist($article);
-        $this->getDm()->flush();
+        $article->setTitle('Hai');
+        $this->getObjectManager()->persist($article);
+        $this->getObjectManager()->flush();
 
         $article->title = 'Ho';
-        $this->getDm()->persist($article);
-        $this->getDm()->flush();
+        $this->getObjectManager()->persist($article);
+        $this->getObjectManager()->flush();
 
         $article->title = 'Hai';
-        $this->getDm()->persist($article);
-        $this->getDm()->flush();
+        $this->getObjectManager()->persist($article);
+        $this->getObjectManager()->flush();
     }
 
     /**
