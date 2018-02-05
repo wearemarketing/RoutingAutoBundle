@@ -15,6 +15,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Entity\AutoRoute;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Functional\Repository\DoctrineOrm;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Article;
+use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\BlogNoTranslatable;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\ConcreteContent;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Blog;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\ConflictProneArticle;
@@ -822,18 +823,15 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
      */
     public function testConflictResolverDefaultThrowException()
     {
-        $this->markTestSkipped('Working...');
-        $blog = new Blog();
-        $blog->path = '/test/test-blog';
-        $blog->title = 'Unit testing blog';
-        $this->getDm()->persist($blog);
-        $this->getDm()->flush();
+        $blog = new BlogNoTranslatable();
+        $blog->setTitle('Unit testing blog');
+        $this->getObjectManager()->persist($blog);
+        $this->getObjectManager()->flush();
 
-        $blog = new Blog();
-        $blog->path = '/test/test-blog-the-second';
-        $blog->title = 'Unit testing blog';
-        $this->getDm()->persist($blog);
-        $this->getDm()->flush();
+        $blog = new BlogNoTranslatable();
+        $blog->setTitle('Unit testing blog');
+        $this->getObjectManager()->persist($blog);
+        $this->getObjectManager()->flush();
     }
 
     public function testGenericNodeShouldBeConvertedInAnAutoRouteNode()
