@@ -18,6 +18,8 @@ use Symfony\Cmf\Bundle\RoutingAutoBundle\Model\ORM\MultiRouteTrait;
 use Symfony\Cmf\Component\Routing\RouteReferrersInterface;
 
 /**
+ * TODO: Try extend from article and see what happend with the behaviour of knp
+ *
  * @ORM\Entity()
  */
 class ConflictProneArticle implements RouteReferrersInterface, TranslatableInterface

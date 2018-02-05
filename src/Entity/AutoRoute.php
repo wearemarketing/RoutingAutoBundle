@@ -66,6 +66,9 @@ class AutoRoute extends Route implements AutoRouteInterface
     private $contentId;
 
     /**
+     *
+     * TODO: Add this field as default param
+     *
      * @ORM\Column(type="string", length=30)
      *
      * @var string
@@ -73,6 +76,8 @@ class AutoRoute extends Route implements AutoRouteInterface
     protected $type;
 
     /**
+     * TODO: Add this field as default param
+     *
      * @ORM\Column(type="string", length=12, nullable=true)
      *
      * @var string

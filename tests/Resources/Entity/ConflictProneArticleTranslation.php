@@ -15,6 +15,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Knp\DoctrineBehaviors\Model as ORMBehaviors;
 
 /**
+ * TODO: Try extend from article and see what happend with the behaviour of knp
+ *
  * @ORM\Entity()
  */
 class ConflictProneArticleTranslation
