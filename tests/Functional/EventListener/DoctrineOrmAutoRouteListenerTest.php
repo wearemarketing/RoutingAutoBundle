@@ -764,42 +764,40 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
 
     public function testConflictResolverAutoIncrement()
     {
-        $this->markTestSkipped('Working...');
-        $this->createBlog();
-        $blog = $this->getDm()->find(null, '/test/test-blog');
+        /** @var DoctrineOrm $repository */
+        $repository = $this->getRepository();
+        $repository->createBlog();
+        $blog = $repository->findBlog('Unit testing blog');
 
         $post = new Post();
-        $post->name = 'Post 1';
-        $post->title = 'Same Title';
-        $post->blog = $blog;
-        $post->date = new \DateTime('2013/03/21');
-        $this->getDm()->persist($post);
-        $this->getDm()->flush();
+        $post->setTitle('Same title');
+        $post->setBlog($blog);
+        $post->setDate(new \DateTime('2013/03/21'));
+        $this->getObjectManager()->persist($post);
+        $this->getObjectManager()->flush();
 
         $post = new Post();
-        $post->name = 'Post 2';
-        $post->title = 'Same Title';
-        $post->blog = $blog;
-        $post->date = new \DateTime('2013/03/21');
-        $this->getDm()->persist($post);
-        $this->getDm()->flush();
+        $post->setTitle('Same Title');
+        $post->setBlog($blog);
+        $post->setDate(new \DateTime('2013/03/21'));
+        $this->getObjectManager()->persist($post);
+        $this->getObjectManager()->flush();
 
         $post = new Post();
-        $post->name = 'Post 3';
-        $post->title = 'Same Title';
-        $post->blog = $blog;
-        $post->date = new \DateTime('2013/03/21');
-        $this->getDm()->persist($post);
-        $this->getDm()->flush();
+        $post->setTitle('Same Title');
+        $post->setBlog($blog);
+        $post->setDate(new \DateTime('2013/03/21'));
+        $this->getObjectManager()->persist($post);
+        $this->getObjectManager()->flush();
 
         $expectedRoutes = [
-            '/test/auto-route/blog/unit-testing-blog/2013/03/21/same-title',
-            '/test/auto-route/blog/unit-testing-blog/2013/03/21/same-title-1',
-            '/test/auto-route/blog/unit-testing-blog/2013/03/21/same-title-2',
+            '/blog/unit-testing-blog/2013/03/21/same-title',
+            '/blog/unit-testing-blog/2013/03/21/same-title-1',
+            '/blog/unit-testing-blog/2013/03/21/same-title-2',
         ];
 
         foreach ($expectedRoutes as $expectedRoute) {
-            $route = $this->getDm()->find('Symfony\Cmf\Bundle\RoutingAutoBundle\Model\AutoRoute', $expectedRoute);
+            $route = $repository->findAutoRoute($expectedRoute);
             $this->assertNotNull($route);
         }
     }
