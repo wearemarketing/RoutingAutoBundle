@@ -653,7 +653,7 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
                     '/seo-articles/en/hello-everybody',
                     '/seo-articles/fr/bonjour-le-monde',
                     '/seo-articles/de/gutentag',
-                    '/seo-articles/hola-todo-el-mundo',
+                    '/seo-articles/es/hola-todo-el-mundo',
                 ],
                 [
                     '/seo-articles/en/goodbye-everybody',
@@ -670,8 +670,6 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
      */
     public function testLeaveRedirect($data, $updatedData, $expectedRedirectRoutePaths, $expectedAutoRoutePaths)
     {
-        $this->markTestSkipped('Something does not work properly. When it is updated values generate duplicated routes');
-
         $article = new SeoArticleMultilang();
 
         foreach ($data as $lang => $title) {
