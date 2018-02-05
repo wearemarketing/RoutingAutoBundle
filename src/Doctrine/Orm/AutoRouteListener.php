@@ -57,6 +57,11 @@ class AutoRouteListener
         return $this->container->get('cmf_routing_auto.metadata.factory');
     }
 
+    private function getOrmAdapter()
+    {
+        return $this->container->get('cmf_routing_auto.adapter.orm');
+    }
+
     /**
      * Removes from the updates array the entities that aren't autoroutable
      * Also, just in case of translations, puts into updates array the translatable entity if it wasn't yet.
@@ -262,24 +267,9 @@ class AutoRouteListener
         $entity = $eventArgs->getEntity();
 
         if ($entity instanceof RouteReferrersInterface) {
-            $entityManager = $eventArgs->getEntityManager();
-            $className = $this->getClassName($entity);
-            $id = $entityManager->getClassMetadata($className)->getIdentifierValues($entity);
-
-            // TODO: remove fqcn of auto route class
-            // TODO: maybe we can extract this code in orm adapter
-            //this workaround is needed to bypass doctrine escaping parameters
-            $dql = sprintf(
-                "select o from %s o WHERE o.%s = '%s' and o.%s = '%s' order by o.position",
-//                $this->routeClassName,
-                AutoRoute::class,
-                AutoRoute::CONTENT_CLASS_KEY,
-                $className,
-                AutoRoute::CONTENT_ID_KEY,
-                json_encode($id)
-            );
-
-            $routes = $entityManager->createQuery($dql)->getResult();
+            /** @var OrmAdapter $adapter */
+            $adapter = $this->getOrmAdapter();
+            $routes = $adapter->getRoutes($entity);
 
             foreach ($routes as $route) {
                 $entity->addRoute($route);
@@ -299,5 +289,32 @@ class AutoRouteListener
         return $entity instanceof \Doctrine\ORM\Proxy\Proxy ?
             get_parent_class($entity) :
             get_class($entity);
+    }
+
+    /**
+     * @param $entity
+     * @param $entityManager
+     * @return mixed
+     */
+    private function getRoutes($entity, $entityManager)
+    {
+        $className = $this->getClassName($entity);
+        $id = $entityManager->getClassMetadata($className)->getIdentifierValues($entity);
+
+        // TODO: remove fqcn of auto route class
+        // TODO: maybe we can extract this code in orm adapter
+        //this workaround is needed to bypass doctrine escaping parameters
+        $dql = sprintf(
+            "select o from %s o WHERE o.%s = '%s' and o.%s = '%s' order by o.position",
+//                $this->routeClassName,
+            AutoRoute::class,
+            AutoRoute::CONTENT_CLASS_KEY,
+            $className,
+            AutoRoute::CONTENT_ID_KEY,
+            json_encode($id)
+        );
+
+        $routes = $entityManager->createQuery($dql)->getResult();
+        return $routes;
     }
 }

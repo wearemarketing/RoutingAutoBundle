@@ -272,6 +272,40 @@ class OrmAdapter implements AdapterInterface
         return AutoRouteInterface::TYPE_PRIMARY == $route->getType() && $autoRouteTag == $route->getTag();
     }
 
+    public function getRoutes($entity)
+    {
+        $className = $this->getClassName($entity);
+        $id = $this->em->getClassMetadata($className)->getIdentifierValues($entity);
+
+        //this workaround is needed to bypass doctrine escaping parameters
+        $dql = sprintf(
+            "select o from %s o WHERE o.%s = '%s' and o.%s = '%s' order by o.position",
+            $this->autoRouteFqcn,
+            AutoRoute::CONTENT_CLASS_KEY,
+            $className,
+            AutoRoute::CONTENT_ID_KEY,
+            json_encode($id)
+        );
+
+        $routes = $this->em->createQuery($dql)->getResult();
+
+        return $routes;
+    }
+
+    /**
+     * Sometimes $entity is a doctrine proxy and we need to retrieve the real entity FQCN.
+     *
+     * @param $entity
+     *
+     * @return string
+     */
+    private function getClassName($entity)
+    {
+        return $entity instanceof \Doctrine\ORM\Proxy\Proxy ?
+            get_parent_class($entity) :
+            get_class($entity);
+    }
+
     /**
      * @param $contentDocument
      * @param $item
