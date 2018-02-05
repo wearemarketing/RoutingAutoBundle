@@ -18,6 +18,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Symfony\Cmf\Bundle\CoreBundle\Translatable\TranslatableInterface;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Enhancer\ContentRouteEnhancer;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Entity\AutoRoute;
+use Symfony\Cmf\Bundle\RoutingAutoBundle\Model\ORM\MultiRouteTrait;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Repository\AutoRouteRepository;
 use Symfony\Cmf\Component\RoutingAuto\AdapterInterface;
 use Symfony\Cmf\Component\RoutingAuto\Model\AutoRouteInterface;
@@ -105,7 +106,9 @@ class OrmAdapter implements AdapterInterface
      */
     public function migrateAutoRouteChildren(AutoRouteInterface $srcAutoRoute = null, AutoRouteInterface $destAutoRoute = null)
     {
-        //implementation is not needed for orm
+        // It is not implemented tree relationship between routes
+        // TODO: if we implemented tree we can use this method for propageting update.
+        // Indeed, we can try to use this method to update route when depends on other one like /category/product and we change category we have to apdate all products.
         return;
     }
 
@@ -240,6 +243,8 @@ class OrmAdapter implements AdapterInterface
      */
     public function getReferringAutoRoutes($contentDocument)
     {
+        // TODO: Remove this method and we will remove the trait.
+        // The idea here is to create a query that get all route related to the content document
         return $contentDocument->getRoutes();
     }
 
