@@ -17,6 +17,7 @@ use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Functional\Repository\DoctrineOrm
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Article;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\ConcreteContent;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Blog;
+use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\ConflictProneArticle;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Post;
 use Symfony\Cmf\Component\Testing\Functional\DbManager\ORM;
 
@@ -604,22 +605,26 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
 
     public function testResolveConflictOnSingleMultilangArticle()
     {
-        $this->markTestSkipped('Working...');
         $article = new ConflictProneArticle();
-        $article->path = '/test/article';
-        $article->title = 'Weekend';
-        $this->getDm()->persist($article);
-        $this->getDm()->bindTranslation($article, 'fr');
+        $article->setLocale('fr');
+        $article->setTitle('Weekend');
+        $article->mergeNewTranslations();
+        $this->getObjectManager()->persist($article);
+        $this->getObjectManager()->flush();
 
-        $article->title = 'Weekend';
-        $this->getDm()->bindTranslation($article, 'en');
+        $article->setLocale('en');
+        $article->setTitle('Weekend');
+        $article->mergeNewTranslations();
+        $this->getObjectManager()->persist($article);
+        $this->getObjectManager()->flush();
+        $this->getObjectManager()->clear();
 
-        $this->getDm()->flush();
-
-        $route = $this->getDm()->find(AutoRoute::class, 'test/auto-route/conflict-prone-articles/weekend');
+        /** @var DoctrineOrm $repository */
+        $repository = $this->getRepository();
+        $route = $repository->findAutoRoute('/conflict-prone-articles/weekend');
         $this->assertNotNull($route);
 
-        $route = $this->getDm()->find(AutoRoute::class, 'test/auto-route/conflict-prone-articles/weekend-1');
+        $route = $repository->findAutoRoute('/conflict-prone-articles/weekend-1');
         $this->assertNotNull($route);
     }
 

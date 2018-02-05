@@ -65,3 +65,11 @@ Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\AbstractContent:
             uri_schema: /articles/{article_title}
     token_providers:
         article_title: [content_method, { method: getTitle } ]
+
+Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\ConflictProneArticle:
+    definitions:
+        view:
+            uri_schema: /conflict-prone-articles/{article_title}
+    token_providers:
+        article_title: [content_method, { method: getTitle } ]
+    conflict_resolver: [auto_increment]
