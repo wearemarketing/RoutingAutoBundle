@@ -8,6 +8,7 @@ use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Functional\RepositoryInterface;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Blog;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\BlogNoTranslatable;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Post;
+use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\PostNoTranslatable;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Entity\AutoRoute;
 
@@ -24,10 +25,18 @@ class DoctrineOrm implements RepositoryInterface
     {
     }
 
-    public function createBlogNoTranslatable()
+    public function createBlogNoTranslatable($withPosts = false)
     {
         $blog = new BlogNoTranslatable();
         $blog->setTitle('Unit testing blog');
+
+        if ($withPosts) {
+            $post = new PostNoTranslatable();
+            $post->setTitle('This is a post title');
+            $post->setBlog($blog);
+            $post->setDate(new \DateTime('2013/03/21'));
+            $this->getObjectManager()->persist($post);
+        }
 
         $this->getObjectManager()->persist($blog);
 
@@ -64,6 +73,7 @@ class DoctrineOrm implements RepositoryInterface
     public function findBlogNoTranslatable($blogName)
     {
         $objectManager = $this->getObjectManager();
+        $objectManager->clear();
 
         $blog = $objectManager
             ->getRepository(BlogNoTranslatable::class)
@@ -111,6 +121,18 @@ class DoctrineOrm implements RepositoryInterface
         return $repository->findOneBy([
             'staticPrefix' => $url,
         ]);
+    }
+
+    public function findPostNoTranslatable($title)
+    {
+        $objectManager = $this->getObjectManager();
+        $objectManager->clear();
+
+        $post = $objectManager
+            ->getRepository(PostNoTranslatable::class)
+            ->findOneByTitle($title);
+
+        return $post;
     }
 
     public function findPost($title)

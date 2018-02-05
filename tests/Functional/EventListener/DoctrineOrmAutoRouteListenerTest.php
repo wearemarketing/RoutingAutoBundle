@@ -125,6 +125,59 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
     /**
      * @dataProvider provideTestUpdateBlog
      */
+    public function testUpdateRenameBlogNoTranslatable($withPosts = false)
+    {
+        /** @var DoctrineOrm $repository */
+        $repository = $this->getRepository();
+        $repository->createBlogNoTranslatable($withPosts);
+
+        /** @var Blog $blog */
+        $blog = $repository->findBlogNoTranslatable('Unit testing blog');
+        // test update
+        $blog->setTitle('Foobar');
+
+        /** @var ObjectManager $objectManager */
+        $objectManager = $this->getObjectManager();
+        $objectManager->persist($blog);
+        $objectManager->flush();
+
+        // note: The NAME stays the same, its the ID not the title
+        $blog = $repository->findBlogNoTranslatable('Foobar');
+        $this->assertNotNull($blog);
+        $routes = $blog->getRoutes();
+        $this->assertCount(1, $routes);
+
+        // How to have to be the new route
+        /** @var AutoRoute $route */
+        $newRoute = $routes[0];
+        $this->assertEquals('BlogNoTranslatable_'.$blog->getId(), $newRoute->getCanonicalName());
+        $this->assertInstanceOf(AutoRoute::class, $newRoute);
+        $this->assertContains('BlogNoTranslatable_'.$blog->getId().'_', $newRoute->getName());
+        $this->assertEquals('/blog/foobar', $newRoute->getStaticPrefix());
+
+        if ($withPosts) {
+            /** @var Post $post */
+            $post = $repository->findPostNoTranslatable('This is a post title');
+            $this->assertNotNull($post);
+
+            $routes = $post->getRoutes();
+            /** @var AutoRoute $route */
+            $route = $routes[0];
+            $this->assertNotNull($route);
+            $this->getObjectManager()->refresh($route);
+
+            // That is not completely right. Has to be /blog/foobar/2013 but with orm
+            // when blog is updated doesn't propagate the change to the "children"
+            $this->assertEquals(
+                '/blog/unit-testing-blog/2013/03/21/this-is-a-post-title',
+                $route->getStaticPrefix()
+            );
+        }
+    }
+
+    /**
+     * @dataProvider provideTestUpdateBlog
+     */
     public function testUpdateRenameBlog($withPosts = false)
     {
         /** @var DoctrineOrm $repository */
