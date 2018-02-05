@@ -90,3 +90,10 @@ Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\SeoArticleMultilang:
     token_providers:
         article_title: [content_method, { method: getTitle } ]
         article_locale: [content_locale, {} ]
+
+Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Page:
+    definitions:
+        view:
+            uri_schema: /{title}
+    token_providers:
+        title: [content_method, { method: getTitle } ]

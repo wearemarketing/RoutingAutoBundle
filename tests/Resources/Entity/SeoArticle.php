@@ -17,6 +17,9 @@ use Symfony\Cmf\Component\Routing\RouteReferrersInterface;
 
 /**
  * @ORM\Entity()
+ * @ORM\InheritanceType("SINGLE_TABLE")
+ * @ORM\DiscriminatorColumn(name="discr", type="string")
+ * @ORM\DiscriminatorMap({"seo_article" = "SeoArticle", "page" = "Page"})
  */
 class SeoArticle implements RouteReferrersInterface
 {

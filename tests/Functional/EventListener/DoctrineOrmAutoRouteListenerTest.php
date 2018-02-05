@@ -19,6 +19,7 @@ use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\BlogNoTranslatab
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\ConcreteContent;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Blog;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\ConflictProneArticle;
+use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Page;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Post;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\SeoArticle;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\SeoArticleMultilang;
@@ -805,15 +806,15 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
 
     public function testCreationOfChildOnRoot()
     {
-        $this->markTestSkipped('Working...');
         $page = new Page();
-        $page->title = 'Home';
-        $page->path = '/test/home';
-        $this->getDm()->persist($page);
-        $this->getDm()->flush();
+        $page->setTitle('Home');
+        $this->getObjectManager()->persist($page);
+        $this->getObjectManager()->flush();
 
-        $expectedRoute = '/test/auto-route/home';
-        $route = $this->getDm()->find('Symfony\Cmf\Bundle\RoutingAutoBundle\Model\AutoRoute', $expectedRoute);
+        /** @var DoctrineOrm $repository */
+        $repository = $this->getRepository();
+        $expectedRoute = '/home';
+        $route = $repository->findAutoRoute($expectedRoute);
 
         $this->assertNotNull($route);
     }
