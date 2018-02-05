@@ -6,7 +6,7 @@
     <services>
         <service id="cmf_routing_auto.enhancer.orm.content_router" class="Symfony\Cmf\Bundle\RoutingAutoBundle\Enhancer\ContentRouteEnhancer">
             <argument type="service" id="doctrine.orm.entity_manager"/>
-            <tag name="dynamic_router_route_enhancer"/>
+            <tag name="dynamic_router_route_enhancer" priority="255"/>
         </service>
 
         <!-- Adapters -->
