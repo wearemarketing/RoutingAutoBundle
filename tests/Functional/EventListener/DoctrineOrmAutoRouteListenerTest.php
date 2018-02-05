@@ -19,6 +19,8 @@ use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\ConcreteContent;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Blog;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\ConflictProneArticle;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Post;
+use Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\SeoArticleMultilang;
+use Symfony\Cmf\Component\RoutingAuto\Model\AutoRouteInterface;
 use Symfony\Cmf\Component\Testing\Functional\DbManager\ORM;
 
 /**
@@ -645,16 +647,16 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
                     'es' => 'Adios todo el mundo',
                 ],
                 [
-                    'test/auto-route/seo-articles/en/hello-everybody',
-                    'test/auto-route/seo-articles/fr/bonjour-le-monde',
-                    'test/auto-route/seo-articles/de/gutentag',
-                    'test/auto-route/seo-articles/hola-todo-el-mundo',
+                    '/seo-articles/en/hello-everybody',
+                    '/seo-articles/fr/bonjour-le-monde',
+                    '/seo-articles/de/gutentag',
+                    '/seo-articles/hola-todo-el-mundo',
                 ],
                 [
-                    'test/auto-route/seo-articles/en/goodbye-everybody',
-                    'test/auto-route/seo-articles/fr/aurevoir-le-monde',
-                    'test/auto-route/seo-articles/de/auf-weidersehn',
-                    'test/auto-route/seo-articles/es/adios-todo-el-mundo',
+                    '/seo-articles/en/goodbye-everybody',
+                    '/seo-articles/fr/aurevoir-le-monde',
+                    '/seo-articles/de/auf-weidersehn',
+                    '/seo-articles/es/adios-todo-el-mundo',
                 ],
             ],
         ];
@@ -665,38 +667,46 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
      */
     public function testLeaveRedirect($data, $updatedData, $expectedRedirectRoutePaths, $expectedAutoRoutePaths)
     {
-        $this->markTestSkipped('Working...');
+        $this->markTestSkipped('Something does not work properly. When it is updated values generate duplicated routes');
+
         $article = new SeoArticleMultilang();
-        $article->title = 'Hai';
-        $article->path = '/test/article-1';
-        $this->getDm()->persist($article);
 
         foreach ($data as $lang => $title) {
-            $article->title = $title;
-            $this->getDm()->bindTranslation($article, $lang);
+            $article->setLocale($lang);
+            $article->setTitle($title);
         }
 
-        $this->getDm()->flush();
+        $article->mergeNewTranslations();
 
+        $this->getObjectManager()->persist($article);
+        $this->getObjectManager()->flush();
+        $this->getObjectManager()->clear();
+
+        $repository = $this->getObjectManager()->getRepository(SeoArticleMultilang::class);
+        /** @var SeoArticleMultilang $article */
+        $article = $repository->find($article->getId());
         foreach ($updatedData as $lang => $title) {
-            $article = $this->getDm()->findTranslation('Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Document\SeoArticleMultilang', '/test/article-1', $lang);
-            $article->title = $title;
-            $this->getDm()->bindTranslation($article, $lang);
+            $article->setLocale($lang);
+            $article->setTitle($title);
         }
 
-        $this->getDm()->persist($article);
-        $this->getDm()->flush();
+        $article->mergeNewTranslations();
 
+        $this->getObjectManager()->persist($article);
+        $this->getObjectManager()->flush();
+
+        /** @var DoctrineOrm $repository */
+        $repository = $this->getRepository();
         foreach ($expectedRedirectRoutePaths as $originalPath) {
-            $redirectRoute = $this->getDm()->find(null, $originalPath);
+            $redirectRoute = $repository->findAutoRoute($originalPath);
             $this->assertNotNull($redirectRoute, 'Redirect exists for: '.$originalPath);
-            $this->assertEquals(AutoRouteInterface::TYPE_REDIRECT, $redirectRoute->getDefault('type'));
+            $this->assertEquals(AutoRouteInterface::TYPE_REDIRECT, $redirectRoute->getType());
         }
 
         foreach ($expectedAutoRoutePaths as $newPath) {
-            $autoRoute = $this->getDm()->find(null, $newPath);
+            $autoRoute = $repository->findAutoRoute($newPath);
             $this->assertNotNull($autoRoute, 'Autoroute exists for: '.$newPath);
-            $this->assertEquals(AutoRouteInterface::TYPE_PRIMARY, $autoRoute->getDefault('type'));
+            $this->assertEquals(AutoRouteInterface::TYPE_PRIMARY, $autoRoute->getType());
         }
     }
 
