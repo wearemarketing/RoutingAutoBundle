@@ -276,45 +276,4 @@ class AutoRouteListener
             }
         }
     }
-
-    /**
-     * Sometimes $entity is a doctrine proxy and we need to retrieve the real entity FQCN.
-     *
-     * @param $entity
-     *
-     * @return string
-     */
-    private function getClassName($entity)
-    {
-        return $entity instanceof \Doctrine\ORM\Proxy\Proxy ?
-            get_parent_class($entity) :
-            get_class($entity);
-    }
-
-    /**
-     * @param $entity
-     * @param $entityManager
-     * @return mixed
-     */
-    private function getRoutes($entity, $entityManager)
-    {
-        $className = $this->getClassName($entity);
-        $id = $entityManager->getClassMetadata($className)->getIdentifierValues($entity);
-
-        // TODO: remove fqcn of auto route class
-        // TODO: maybe we can extract this code in orm adapter
-        //this workaround is needed to bypass doctrine escaping parameters
-        $dql = sprintf(
-            "select o from %s o WHERE o.%s = '%s' and o.%s = '%s' order by o.position",
-//                $this->routeClassName,
-            AutoRoute::class,
-            AutoRoute::CONTENT_CLASS_KEY,
-            $className,
-            AutoRoute::CONTENT_ID_KEY,
-            json_encode($id)
-        );
-
-        $routes = $entityManager->createQuery($dql)->getResult();
-        return $routes;
-    }
 }
