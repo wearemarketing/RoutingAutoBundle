@@ -138,7 +138,7 @@ class OrmAdapter implements AdapterInterface
         $headRoute->setDefaults($defaults);
         $headRoute->setContent($contentDocument);
         $headRoute->setStaticPrefix($uriContext->getUri());
-        $headRoute->setAutoRouteTag($autoRouteTag);
+        $headRoute->setLocale($autoRouteTag);
         $headRoute->setType(AutoRouteInterface::TYPE_PRIMARY);
         $headRoute->setContentClass($documentClassName);
         $headRoute->setContentId($id);

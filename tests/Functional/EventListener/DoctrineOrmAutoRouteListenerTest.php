@@ -73,11 +73,11 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
         $locale = 'no-multilang';
         $this->assertContains('BlogNoTranslatable_'.$blog->getId().'_', $route->getName());
         $this->assertEquals('BlogNoTranslatable_'.$blog->getId(), $route->getCanonicalName());
-        $this->assertEquals($locale, $route->getAutoRouteTag());
         $this->assertEquals(
             [
                 '_controller' => 'BlogController',
                 'type' => 'cmf_routing_auto.primary',
+                '_route_auto_tag' => 'no-multilang',
             ],
             $route->getDefaults()
         );
@@ -109,12 +109,12 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
         $locale = 'en';
         $this->assertContains('Blog_'.$blog->getId().'_'.$locale.'_', $route->getName());
         $this->assertEquals('Blog_'.$blog->getId(), $route->getCanonicalName());
-        $this->assertEquals($locale, $route->getAutoRouteTag());
         $this->assertEquals(
             [
                 '_controller' => 'BlogController',
                 '_locale' => 'en',
                 'type' => 'cmf_routing_auto.primary',
+                '_route_auto_tag' => $locale,
             ],
             $route->getDefaults()
         );
@@ -222,7 +222,6 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
         $this->assertInstanceOf(AutoRoute::class, $oldRoute);
         $this->assertContains('Blog_'.$blog->getId().'_en_', $oldRoute->getName());
         $this->assertEquals('/blog/unit-testing-blog', $oldRoute->getStaticPrefix());
-        $this->assertEquals('en', $oldRoute->getAutoRouteTag());
         $this->assertEquals(
             [
                 '_controller' => 'FrameworkBundle:Redirect:redirect',
@@ -230,6 +229,7 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
                 'route' => $newRoute->getName(),
                 'permanent' => true,
                 'type' => 'cmf_routing_auto.redirect',
+                '_route_auto_tag' => 'en',
             ],
             $oldRoute->getDefaults()
         );
@@ -754,9 +754,9 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
         // Also, We test if the route is right
         /** @var AutoRoute $route */
         $route = $routes[0];
-        $this->assertEquals('no-multilang', $route->getTag());
+        $this->assertEquals('no-multilang', $route->getLocale());
         $this->assertEquals('/articles/hello', $route->getStaticPrefix());
-        $this->assertEquals(['type' => 'cmf_routing_auto.primary'], $route->getDefaults());
+        $this->assertEquals('cmf_routing_auto.primary', $route->getType());
 
         // Maybe... we have to test the same but with a translatable entity
     }

@@ -19,6 +19,7 @@ class AutoRoute extends Route implements AutoRouteInterface
 {
     const CONTENT_CLASS_KEY = 'contentClass';
     const CONTENT_ID_KEY = 'contentId';
+    const DEFAULT_KEY_AUTO_ROUTE_LOCALE = '_route_auto_tag';
 
     /**
      * Identifier.
@@ -66,19 +67,11 @@ class AutoRoute extends Route implements AutoRouteInterface
      */
     private $contentId;
 
-    /**
-     * TODO: Add this field as default param
-     *
-     * @ORM\Column(type="string", length=12, nullable=true)
-     *
-     * @var string
-     */
-    protected $tag;
-
     public function __construct(array $options = [])
     {
         parent::__construct($options);
 
+        // TODO: Think if we can remove it
         $this->setType(AutoRouteInterface::TYPE_PRIMARY);
     }
 
@@ -173,24 +166,6 @@ class AutoRoute extends Route implements AutoRouteInterface
     /**
      * {@inheritdoc}
      */
-    public function setAutoRouteTag($tag)
-    {
-        $this->tag = $tag;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAutoRouteTag()
-    {
-        return $this->tag;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function setRedirectTarget($autoTarget)
     {
         $this->setDefault('_controller', 'FrameworkBundle:Redirect:redirect');
@@ -261,7 +236,7 @@ class AutoRoute extends Route implements AutoRouteInterface
      */
     public function getLocale()
     {
-        return $this->tag;
+        return $this->getDefault(self::DEFAULT_KEY_AUTO_ROUTE_LOCALE);
     }
 
     /**
@@ -269,7 +244,7 @@ class AutoRoute extends Route implements AutoRouteInterface
      */
     public function setLocale($locale)
     {
-        $this->tag = $locale;
+        $this->setDefault(self::DEFAULT_KEY_AUTO_ROUTE_LOCALE, $locale);
     }
 
     /**
@@ -286,21 +261,5 @@ class AutoRoute extends Route implements AutoRouteInterface
     public function getType()
     {
         return $this->getDefault('type');
-    }
-
-    /**
-     * @param string $tag
-     */
-    public function setTag($tag)
-    {
-        $this->tag = $tag;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTag()
-    {
-        return $this->tag;
     }
 }
