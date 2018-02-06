@@ -196,18 +196,6 @@ class OrmAdapter implements AdapterInterface
     }
 
     /**
-     * Calculates the new position for redirect urls. Provides an higher number to allow route sorting.
-     *
-     * @param int $newRoutePosition
-     *
-     * @return int
-     */
-    private function calculateReferringRoutePosition($newRoutePosition)
-    {
-        return $newRoutePosition * 10 + 1;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getRealClassName($className)
@@ -251,14 +239,16 @@ class OrmAdapter implements AdapterInterface
     }
 
     /**
-     * @param $autoRouteTag
-     * @param $route
-     *
-     * @return bool
+     * {@inheritdoc}
      */
-    protected function isPrimaryAndSameLocale($autoRouteTag, $route)
+    public function compareAutoRouteLocale(AutoRouteInterface $autoRoute, $locale)
     {
-        return AutoRouteInterface::TYPE_PRIMARY == $route->getType() && $autoRouteTag == $route->getTag();
+        $autoRouteLocale = $autoRoute->getLocale();
+        if (self::TAG_NO_MULTILANG === $autoRouteLocale) {
+            $autoRouteLocale = null;
+        }
+
+        return $autoRouteLocale === $locale;
     }
 
     public function getRoutes($entity)
@@ -282,6 +272,18 @@ class OrmAdapter implements AdapterInterface
     }
 
     /**
+     * Calculates the new position for redirect urls. Provides an higher number to allow route sorting.
+     *
+     * @param int $newRoutePosition
+     *
+     * @return int
+     */
+    private function calculateReferringRoutePosition($newRoutePosition)
+    {
+        return $newRoutePosition * 10 + 1;
+    }
+
+    /**
      * Sometimes $entity is a doctrine proxy and we need to retrieve the real entity FQCN.
      *
      * @param $entity
@@ -293,18 +295,5 @@ class OrmAdapter implements AdapterInterface
         return $entity instanceof \Doctrine\ORM\Proxy\Proxy ?
             get_parent_class($entity) :
             get_class($entity);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function compareAutoRouteLocale(AutoRouteInterface $autoRoute, $locale)
-    {
-        $autoRouteLocale = $autoRoute->getLocale();
-        if (self::TAG_NO_MULTILANG === $autoRouteLocale) {
-            $autoRouteLocale = null;
-        }
-
-        return $autoRouteLocale === $locale;
     }
 }

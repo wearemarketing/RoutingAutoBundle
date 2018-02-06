@@ -67,14 +67,6 @@ class AutoRoute extends Route implements AutoRouteInterface
      */
     private $contentId;
 
-    public function __construct(array $options = [])
-    {
-        parent::__construct($options);
-
-        // TODO: Think if we can remove it
-        $this->setType(AutoRouteInterface::TYPE_PRIMARY);
-    }
-
     /**
      * @return string
      */
