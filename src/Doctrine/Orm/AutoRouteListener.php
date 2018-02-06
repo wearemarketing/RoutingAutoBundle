@@ -22,7 +22,6 @@ use Symfony\Cmf\Bundle\RoutingAutoBundle\Entity\AutoRoute;
 use Symfony\Cmf\Component\Routing\RouteReferrersInterface;
 use Symfony\Cmf\Component\RoutingAuto\AutoRouteManager;
 use Symfony\Cmf\Component\RoutingAuto\Mapping\Exception\ClassNotMappedException;
-use Symfony\Cmf\Component\RoutingAuto\Mapping\MetadataFactory;
 use Symfony\Cmf\Component\RoutingAuto\Model\AutoRouteInterface;
 use Symfony\Cmf\Component\RoutingAuto\UriContextCollection;
 use Symfony\Component\DependencyInjection\ContainerInterface;

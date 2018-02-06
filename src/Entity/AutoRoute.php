@@ -5,12 +5,11 @@ namespace Symfony\Cmf\Bundle\RoutingAutoBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Cmf\Bundle\RoutingBundle\Model\Route;
 use Symfony\Cmf\Component\RoutingAuto\Model\AutoRouteInterface;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\ref;
 
 /**
  * TODO: create 2 tables or only one
  * TODO: if we create one table, which name for all routes and auto routes
- * TODO: Add all index as in Orm\Route
+ * TODO: Add all index as in Orm\Route.
  *
  * @ORM\Entity()
  * @ORM\Table(name="orm_auto_routes")

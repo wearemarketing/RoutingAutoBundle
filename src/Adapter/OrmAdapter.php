@@ -16,10 +16,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Symfony\Cmf\Bundle\CoreBundle\Translatable\TranslatableInterface;
-use Symfony\Cmf\Bundle\RoutingAutoBundle\Enhancer\ContentRouteEnhancer;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Entity\AutoRoute;
-use Symfony\Cmf\Bundle\RoutingAutoBundle\Model\ORM\MultiRouteTrait;
-use Symfony\Cmf\Bundle\RoutingAutoBundle\Repository\AutoRouteRepository;
 use Symfony\Cmf\Component\RoutingAuto\AdapterInterface;
 use Symfony\Cmf\Component\RoutingAuto\Model\AutoRouteInterface;
 use Symfony\Cmf\Component\RoutingAuto\UriContext;
@@ -54,7 +51,7 @@ class OrmAdapter implements AdapterInterface
 
     /**
      * @param EntityManagerInterface $em
-     * @param string                 $autoRouteFqcn        The FQCN of the AutoRoute document to use
+     * @param string                 $autoRouteFqcn The FQCN of the AutoRoute document to use
      */
     public function __construct(EntityManagerInterface $em, $autoRouteFqcn)
     {

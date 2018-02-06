@@ -2,7 +2,6 @@
 
 namespace Symfony\Cmf\Bundle\RoutingAutoBundle\Enhancer;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Adapter\OrmAdapter;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Entity\AutoRoute;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
