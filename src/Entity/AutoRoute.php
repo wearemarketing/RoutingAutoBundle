@@ -12,7 +12,7 @@ use function Symfony\Component\DependencyInjection\Loader\Configurator\ref;
  * TODO: if we create one table, which name for all routes and auto routes
  * TODO: Add all index as in Orm\Route
  *
- * @ORM\Entity(repositoryClass="Symfony\Cmf\Bundle\RoutingAutoBundle\Repository\AutoRouteRepository")
+ * @ORM\Entity()
  * @ORM\Table(name="orm_auto_routes")
  */
 class AutoRoute extends Route implements AutoRouteInterface

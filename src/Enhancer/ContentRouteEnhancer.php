@@ -3,6 +3,7 @@
 namespace Symfony\Cmf\Bundle\RoutingAutoBundle\Enhancer;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Cmf\Bundle\RoutingAutoBundle\Adapter\OrmAdapter;
 use Symfony\Cmf\Bundle\RoutingAutoBundle\Entity\AutoRoute;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,13 +17,13 @@ use Symfony\Cmf\Component\Routing\Enhancer\RouteEnhancerInterface;
 class ContentRouteEnhancer implements RouteEnhancerInterface
 {
     /**
-     * @var \Doctrine\Common\Persistence\ObjectRepository|\Symfony\Cmf\Bundle\RoutingAutoBundle\Repository\AutoRouteRepository
+     * @var OrmAdapter
      */
-    private $repository;
+    private $manager;
 
-    public function __construct(EntityManagerInterface $manager)
+    public function __construct(OrmAdapter $manager)
     {
-        $this->repository = $manager->getRepository(AutoRoute::class);
+        $this->manager = $manager;
     }
 
     /**
@@ -36,7 +37,7 @@ class ContentRouteEnhancer implements RouteEnhancerInterface
         $routeObject = $defaults[RouteObjectInterface::ROUTE_OBJECT];
 
         if ($routeObject instanceof AutoRoute) {
-            $this->repository->resolveRouteContent($routeObject);
+            $this->manager->resolveRouteContent($routeObject);
         }
 
         return $defaults;

@@ -233,7 +233,7 @@ class OrmAdapter implements AdapterInterface
             return null;
         }
 
-        $this->repository->resolveRouteContent($route);
+        $this->resolveRouteContent($route);
 
         return $route;
     }
@@ -269,6 +269,24 @@ class OrmAdapter implements AdapterInterface
         $routes = $this->em->createQuery($dql)->getResult();
 
         return $routes;
+    }
+
+    public function resolveRouteContent(AutoRoute $autoRoute)
+    {
+        $class = $autoRoute->getContentClass();
+        $id = $autoRoute->getContentId();
+        if (empty($class) or empty($id)) {
+            return;
+        }
+
+        $objectRepository = $this->em->getRepository($class);
+        $object = $objectRepository->find($id);
+        // TODO: looking for a better approach. It is because we use knp doctrine behaviour
+        if ($object instanceof TranslatableInterface) {
+            $object->setCurrentLocale($autoRoute->getDefault('_locale'));
+        }
+
+        $autoRoute->setContent($object);
     }
 
     /**
