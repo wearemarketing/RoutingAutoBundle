@@ -124,35 +124,24 @@ class OrmAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function createAutoRoute(UriContext $uri, $autoRouteTag)
+    public function createAutoRoute(UriContext $uriContext, $autoRouteTag)
     {
-        $seoMetaData = array('title' => '', 'description' => '', 'metaKeywords' => '');
-        $contentDocument = $uri->getSubject();
-
-        foreach ($contentDocument->getRoutes() as $route) {
-            if ($this->isPrimaryAndSameLocale($autoRouteTag, $route)) {
-//                $this->updateSeoData($contentDocument, $route);
-
-//                $seoMetaData = $route->getSeoMetaData();
-            }
-        }
-
+        $contentDocument = $uriContext->getSubject();
         $documentClassName = get_class($contentDocument);
         /** @var ClassMetadata $metadata */
         $metadata = $this->em->getClassMetadata($documentClassName);
         $id = $metadata->getIdentifierValues($contentDocument);
-        $defaults = $uri->getDefaults();
+        $defaults = $uriContext->getDefaults();
 
         /** @var AutoRoute $headRoute */
         $headRoute = new $this->autoRouteFqcn();
+        $headRoute->setDefaults($defaults);
         $headRoute->setContent($contentDocument);
-        $headRoute->setStaticPrefix($uri->getUri());
+        $headRoute->setStaticPrefix($uriContext->getUri());
         $headRoute->setAutoRouteTag($autoRouteTag);
         $headRoute->setType(AutoRouteInterface::TYPE_PRIMARY);
         $headRoute->setContentClass($documentClassName);
         $headRoute->setContentId($id);
-        $headRoute->setDefaults($defaults);
-//        $headRoute->setSeoMetaData($seoMetaData);
 
         //Route name is compound by: table name, row id, locale if present, type, unique id
         $routeNameParts = array_merge(
@@ -304,27 +293,6 @@ class OrmAdapter implements AdapterInterface
         return $entity instanceof \Doctrine\ORM\Proxy\Proxy ?
             get_parent_class($entity) :
             get_class($entity);
-    }
-
-    /**
-     * @param $contentDocument
-     * @param $item
-     */
-    private function updateSeoData($contentDocument, $item)
-    {
-        if ($contentDocument instanceof SeoMetaReadInterface) {
-            if ($item->getSeoMetaData()['title'] != $contentDocument->getSeoTitle()) {
-                $item->getSeoMetaData()['title'] = $contentDocument->getSeoTitle();
-            }
-
-            if ($item->getSeoMetaData()['description'] != $contentDocument->getSeoDescription()) {
-                $item->getSeoMetaData()['description'] = $contentDocument->getSeoDescription();
-            }
-
-            if ($item->getSeoMetaData()['metaKeywords'] != $contentDocument->getSeoKeywords()) {
-                $item->getSeoMetaData()['metaKeywords'] = $contentDocument->getSeoKeywords();
-            }
-        }
     }
 
     /**
