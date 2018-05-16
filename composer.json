@@ -3,6 +3,10 @@
     "description": "Bundle which automatically creates and manages routes for persisted objects",
     "homepage": "http://cmf.symfony.com",
     "license": "MIT",
+    "repositories": [
+        { "type": "path", "url": "../wearemarketing/src/WAM/Bundle/RoutingBundle"},
+        { "type": "composer", "url": "https://packages.wamrelease.net" }
+    ],
     "authors": [
         {
             "name": "Symfony CMF Community",
@@ -19,7 +23,8 @@
         "symfony/symfony": "3.4.*",
         "doctrine/orm": "~2.5.0",
         "symfony-cmf/core-bundle": "^2.0",
-        "knplabs/doctrine-behaviors": "1.4.*"
+        "knplabs/doctrine-behaviors": "1.4.*",
+        "wearemarketing/routingbundle": "dev-master"
     },
     "require-dev": {
         "symfony-cmf/testing": "^1.3|^2.0",

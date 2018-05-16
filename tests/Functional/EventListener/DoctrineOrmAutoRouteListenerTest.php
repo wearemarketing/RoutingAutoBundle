@@ -64,7 +64,7 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
         /** @var \Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\BlogNoTranslatable $blog */
         // make sure auto-route has been persisted
         $blog = $repository->findBlogNoTranslatable('Unit testing blog');
-        $routes = $blog->getRoutes();
+        $routes = $repository->findRoutesForContent($blog);
 
         $this->assertCount(1, $routes, 'There is no route associted with Entity');
         /** @var AutoRoute $route */
@@ -100,7 +100,7 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
         /** @var \Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Entity\Blog $blog */
         // make sure auto-route has been persisted
         $blog = $repository->findBlog('Unit testing blog');
-        $routes = $blog->getRoutes();
+        $routes = $repository->findRoutesForContent($blog);
 
         $this->assertCount(1, $routes, 'There is no route associted with Entity');
         /** @var AutoRoute $route */
@@ -146,16 +146,17 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
         $objectManager = $this->getObjectManager();
         $objectManager->persist($blog);
         $objectManager->flush();
-
+        $objectManager->clear();
         // note: The NAME stays the same, its the ID not the title
         $blog = $repository->findBlogNoTranslatable('Foobar');
         $this->assertNotNull($blog);
-        $routes = $blog->getRoutes();
-        $this->assertCount(1, $routes);
+//        $routes = $blog->getRoutes();
+        $newRoute = $repository->findAutoRoute('/blog/foobar');
+//        $this->assertCount(1, $routes);
 
         // How to have to be the new route
         /** @var AutoRoute $route */
-        $newRoute = $routes[0];
+//        $newRoute = $routes[0];
         $this->assertEquals('BlogNoTranslatable_'.$blog->getId(), $newRoute->getCanonicalName());
         $this->assertInstanceOf(AutoRoute::class, $newRoute);
         $this->assertContains('BlogNoTranslatable_'.$blog->getId().'_', $newRoute->getName());
@@ -166,9 +167,10 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
             $post = $repository->findPostNoTranslatable('This is a post title');
             $this->assertNotNull($post);
 
-            $routes = $post->getRoutes();
+//            $routes = $post->getRoutes();
             /** @var AutoRoute $route */
-            $route = $routes[0];
+//            $route = $routes[0];
+            $route = $repository->findAutoRoute('/blog/unit-testing-blog/2013/03/21/this-is-a-post-title');
             $this->assertNotNull($route);
             $this->getObjectManager()->refresh($route);
 
@@ -203,8 +205,9 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
 
         // note: The NAME stays the same, its the ID not the title
         $blog = $repository->findBlog('Foobar');
+
+        $routes = $repository->findRoutesForContent($blog);
         $this->assertNotNull($blog);
-        $routes = $blog->getRoutes();
         $this->assertCount(2, $routes);
 
         // How to have to be the new route
@@ -239,7 +242,7 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
             $post = $repository->findPost('This is a post title');
             $this->assertNotNull($post);
 
-            $routes = $post->getRoutes();
+            $routes = $repository->findRoutesForContent($post);
             /** @var AutoRoute $route */
             $route = $routes[0];
             $this->assertNotNull($route);
@@ -262,6 +265,10 @@ class DoctrineOrmAutoRouteListenerTest extends ListenerTestCase
 
         /** @var Post $post */
         $post = $repository->findPostNoTranslatable('This is a post title');
+//        foreach ($repository->findRoutesForContent($post) as $route){
+//            $post->addRoute($route);
+//        };
+
         $this->assertNotNull($post);
 
         $post->setBody('Test');

@@ -28,6 +28,33 @@ class AppKernel extends TestKernel
             new \Symfony\Cmf\Bundle\RoutingBundle\CmfRoutingBundle(),
             new \Symfony\Cmf\Bundle\RoutingAutoBundle\CmfRoutingAutoBundle(),
 
+            new \WAM\Bundle\RoutingBundle\WAMRoutingBundle(),
+
+            new \FOS\UserBundle\FOSUserBundle(),
+            new \Knp\Bundle\MenuBundle\KnpMenuBundle(),
+            new \Sonata\EasyExtendsBundle\SonataEasyExtendsBundle(),
+
+            new \Sonata\CoreBundle\SonataCoreBundle(),
+            new \Sonata\AdminBundle\SonataAdminBundle(),
+            new \Sonata\DoctrineORMAdminBundle\SonataDoctrineORMAdminBundle(),
+            new \Sonata\UserBundle\SonataUserBundle(),
+            new \Sonata\SeoBundle\SonataSeoBundle(),
+            new \Sonata\MediaBundle\SonataMediaBundle(),
+            new \Sonata\ClassificationBundle\SonataClassificationBundle(),
+            new \Sonata\TranslationBundle\SonataTranslationBundle(),
+            new \Sonata\BlockBundle\SonataBlockBundle(),
+            new Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),
+
+
+            new \Symfony\Cmf\Bundle\CoreBundle\CmfCoreBundle(),
+
+            new \WAM\Bundle\CoreBundle\WAMCoreBundle(),
+            new \WAM\Bundle\UserBundle\WAMUserBundle(),
+            new \WAM\Bundle\LocaleBundle\WAMLocaleBundle(),
+            new \WAM\Bundle\MediaBundle\WAMMediaBundle(),
+            new \WAM\Bundle\ClassificationBundle\WAMClassificationBundle(),
+            new \WAM\Bundle\BlockBundle\WAMBlockBundle(),
+
             new \Symfony\Cmf\Bundle\RoutingAutoBundle\Tests\Resources\Bundle\TestBundle\TestBundle(),
         ]);
     }

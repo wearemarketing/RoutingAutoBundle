@@ -26,9 +26,22 @@ trait MultiRouteTrait
     {
         $this->initRoutes();
 
-        if (!in_array($route, $this->routes)) {
+        $found = false;
+        foreach ($this->routes as $r){
+            if($r->getId() == $route->getId()){
+                $found = true;
+                break;
+            }
+        }
+
+        if(!$found){
             $this->routes[] = $route;
         }
+//        $key = array_search($route, $this->routes);
+//
+//        if ($key === false) {
+//            $this->routes[] = $route;
+//        }
 
         return $this;
     }
@@ -46,7 +59,10 @@ trait MultiRouteTrait
     public function removeRoute($route)
     {
         $this->initRoutes();
-        if ($key = array_search($route, $this->routes)) {
+
+        $key = array_search($route, $this->routes);
+
+        if ($key !== false) {
             unset($this->routes[$key]);
         }
 

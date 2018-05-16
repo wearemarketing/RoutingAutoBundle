@@ -3,3 +3,18 @@ parameters:
     database_path: '%kernel.root_dir%/cache/app.sqlite'
 
     locale: en
+#    database_driver: pdo_mysql
+#    env(MYSQL_DATABASE_HOST): 127.0.0.1
+    database_port: ~
+#    env(MYSQL_DATABASE_NAME): wam_wearemarketing_test
+#    env(MYSQL_DATABASE_USER): user
+#    env(MYSQL_DATABASE_PASSWORD): pass
+    database_memory: true
+    locales:
+        - es
+        - en
+        - fr
+    secret: kKf93jFKdsj98342kdfsnjmvdsflKnjdfsjik
+    contact_email: develop@wearemarketing.com
+    env(WKHTMLTOPDF_PATH): 'xvfb-run -a -s "-screen 0 640x480x16" wkhtmltopdf'
+    env(ENV_TEST_CHANNEL_READABLE): no_parallel

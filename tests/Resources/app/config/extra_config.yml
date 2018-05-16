@@ -1,2 +1,22 @@
 imports:
     - { resource: '../../../../vendor/knplabs/doctrine-behaviors/config/orm-services.yml' }
+
+monolog:
+    handlers:
+        main:
+            type:  stream
+            path:  "%kernel.logs_dir%/%kernel.environment%.log"
+            level: debug
+
+wam_media:
+    filesystem_local_directory:  "%kernel.root_dir%/var/uploads/media"
+
+sonata_block:
+    default_contexts: [cms]
+    blocks:
+        sonata.admin.block.admin_list:
+            contexts:   [admin]
+
+wam_core:
+    pdf:
+        command_path: "%env(WKHTMLTOPDF_PATH)%"

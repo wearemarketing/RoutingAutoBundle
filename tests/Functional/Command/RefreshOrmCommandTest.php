@@ -64,7 +64,7 @@ class RefreshOrmCommandTest extends OrmBaseTestCase
         $post = $this->getRepository()->findPost('This is a post title');
         $this->getObjectManager()->refresh($post);
 
-        $routes = $post->getRoutes();
+        $routes = $repository->findRoutesForContent($post);
         $this->assertCount(2, $routes);
         /** @var AutoRoute $route */
         $route = $routes[1];

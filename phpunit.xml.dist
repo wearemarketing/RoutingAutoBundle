@@ -4,6 +4,7 @@
 <phpunit
     colors="true"
     bootstrap="vendor/symfony-cmf/testing/bootstrap/bootstrap.php"
+    stopOnFailure="true"
     >
 
     <testsuites>
@@ -27,6 +28,7 @@
 
     <php>
         <server name="KERNEL_DIR" value="tests/Resources/app" />
+        <ini name="error_reporting" value="-16385"/>
     </php>
 
 </phpunit>

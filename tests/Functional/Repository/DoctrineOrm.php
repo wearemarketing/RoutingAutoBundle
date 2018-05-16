@@ -246,4 +246,12 @@ class DoctrineOrm implements RepositoryInterface
 
         return $routes->toArray();
     }
+
+    public function findRoutesForContent($document)
+    {
+        if (!method_exists($document, 'getId')) {
+            throw new \Exception('We can get routes for this entity: '.get_class($document));
+        }
+        return $this->findRoutesForArticle($document);
+    }
 }
