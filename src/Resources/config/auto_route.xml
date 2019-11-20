@@ -9,7 +9,7 @@
         </service>
 
         <!-- Auto Route Manager -->
-        <service id="cmf_routing_auto.auto_route_manager" class="Symfony\Cmf\Component\RoutingAuto\AutoRouteManager">
+        <service id="cmf_routing_auto.auto_route_manager" class="Symfony\Cmf\Component\RoutingAuto\AutoRouteManager" public="true">
             <argument type="service" id="cmf_routing_auto.adapter" />
             <argument type="service" id="cmf_routing_auto.uri_generator" />
             <argument type="service" id="cmf_routing_auto.defunct_route_handler.delegating" />
@@ -54,7 +54,7 @@
             <argument>%cmf_routing_auto.metadata.loader.resources%</argument>
         </service>
 
-        <service id="cmf_routing_auto.metadata.factory" class="Symfony\Cmf\Component\RoutingAuto\Mapping\MetadataFactory">
+        <service id="cmf_routing_auto.metadata.factory" class="Symfony\Cmf\Component\RoutingAuto\Mapping\MetadataFactory" public="true">
             <factory service="cmf_routing_auto.metadata.factory.builder" method="getMetadataFactory" />
         </service>
 
