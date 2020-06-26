@@ -37,6 +37,8 @@ class CmfRoutingAutoExtension extends Extension
 
         $resources = array();
 
+        $container->setParameter('cmf_routing_auto.uri_generator.class', $config['uri_generator']);
+
         // auto mapping
         if ($config['auto_mapping']) {
             $bundles = $container->getParameter('kernel.bundles');

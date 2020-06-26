@@ -17,7 +17,7 @@
         </service>
 
         <!-- URL Generator -->
-        <service id="cmf_routing_auto.uri_generator" class="Symfony\Cmf\Component\RoutingAuto\UriGenerator">
+        <service id="cmf_routing_auto.uri_generator" class="%cmf_routing_auto.uri_generator.class%">
             <argument type="service" id="cmf_routing_auto.service_registry" />
         </service>
 
