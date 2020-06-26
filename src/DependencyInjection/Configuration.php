@@ -11,11 +11,14 @@
 
 namespace Symfony\Cmf\Bundle\RoutingAutoBundle\DependencyInjection;
 
+use Symfony\Cmf\Component\RoutingAuto\UriGenerator;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 class Configuration implements ConfigurationInterface
 {
+    const DEFAULT_URI_GENERATOR = UriGenerator::class;
+
     /**
      * Returns the config tree builder.
      *
@@ -28,6 +31,7 @@ class Configuration implements ConfigurationInterface
             ->addDefaultsIfNotSet()
             ->children()
                 ->scalarNode('adapter')->info('Use a specific adapter, overrides any implicit selection')->end()
+                ->scalarNode('uri_generator')->defaultValue(self::DEFAULT_URI_GENERATOR)->end()
                 ->booleanNode('auto_mapping')->defaultTrue()->end()
                 ->arrayNode('mapping')
                     ->fixXmlConfig('resource')
