@@ -141,11 +141,11 @@ class OrmAdapter implements AdapterInterface
         $headRoute->setContent($contentDocument);
         $headRoute->setStaticPrefix($uri->getUri());
         $headRoute->setAutoRouteTag($autoRouteTag);
-        $headRoute->setType(AutoRouteInterface::TYPE_PRIMARY);
-        $headRoute->setContentClass($documentClassName);
-        $headRoute->setContentId($id);
-        $headRoute->setDefaults($defaults);
-        $headRoute->setSeoMetaData($seoMetaData);
+	    $headRoute->setContentClass($documentClassName);
+	    $headRoute->setContentId($id);
+	    $headRoute->setDefaults($defaults);
+	    $headRoute->setType(AutoRouteInterface::TYPE_PRIMARY);
+	    $headRoute->setSeoMetaData($seoMetaData);
 
         //Route name is compound by: table name, row id, locale if present, type, epoch time
         $routeNameParts = array_merge(
